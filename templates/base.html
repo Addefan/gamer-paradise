@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Интернет-магазин видеоигр">
+    {% block styles %}
+        {{ bootstrap.load_css() }}
+        <link rel="stylesheet" href="../static/css/style.css">
+    {% endblock %}
+    <title>{% block title %}Gamer Paradise{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}?">
+</head>
+<body>
+{% block navbar %}
+    {% include 'navbar.html' %}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/favicon.ico') }}"
+                     alt="Gamer Paradise"
+                     class="rounded img-thumbnail ms-3 mt-4">
+            </div>
+            <div class="h4 float-left col-md-6 ms-3 mt-4">
+                <strong>Gamer Paradise</strong> - это интернет-магазин видеоигр для различных
+                платформ: PC, Plastation, Xbox и других
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    {{ bootstrap.load_js() }}
+{% endblock %}
+</body>
+</html>

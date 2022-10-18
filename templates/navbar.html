@@ -1,0 +1,29 @@
+<nav class="p-3 bg-dark text-white navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="{{ url_for('main') }}"
+               class="navbar-brand d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <img src="{{ url_for('static', filename='images/gamer_paradise_icon.png') }}"
+                     width="30" height="30" alt="Gamer Paradise"
+                     class="d-inline-block align-text-top me-2">Gamer Paradise
+            </a>
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="#" class="nav-link px-2 text-white me-2">🛍 Товары</a></li> {# TODO: исправить ссылку #}
+                <li><a href="#" class="nav-link px-2 text-white me-2">⭐ Избранное</a></li> {# TODO: исправить ссылку #}
+                <li><a href="#" class="nav-link px-2 text-white me-2">🛒 Корзина</a></li> {# TODO: исправить ссылку #}
+                {% if g.user and g.user.role == 'admin' %} {# TODO: поработать над условием #}
+                    <li><a href="#" class="nav-link px-2 text-white me-2">📦 Добавить товар</a></li> {# TODO: исправить ссылку #}
+                {% endif %}
+            </ul>
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex" method="get">
+                <input type="search" class="form-control form-control-dark text-white me-2"
+                       placeholder="Поиск товаров" aria-label="Search">
+                <button class="btn btn-outline-secondary" type="submit">🔎</button> {# TODO: исправить нажатие #}
+            </form>
+            <div class="text-end">
+                <button type="button" class="btn btn-light me-2">Зарегистрироваться</button> {# TODO: исправить нажатие #}
+                <button type="button" class="btn btn-outline-light me-2">Войти</button> {# TODO: исправить нажатие #}
+            </div>
+        </div>
+    </div>
+</nav>
