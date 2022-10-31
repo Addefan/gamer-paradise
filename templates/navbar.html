@@ -1,38 +1,46 @@
-<nav class="p-3 bg-dark text-white navbar-fixed-top">
+{% macro icon(name, classes='') %}
+    <iconify-icon class="{{ classes }}" icon="{{ name }}"></iconify-icon>
+{% endmacro %}
+
+{% macro nav_link(title, icon_name, additional_classes='', href='#') %}
+    <a href="{{ href }}" class="nav-link px-0 text-white me-3 {{ additional_classes }}">
+        {{ icon(icon_name, 'me-1') }}
+        {{ title }}
+    </a>
+{% endmacro %}
+
+<nav class="navbar navbar-dark bg-dark navbar-expand-xl p-2">
     <div class="container-fluid">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="{{ url_for('main') }}"
-               class="navbar-brand d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <img src="{{ url_for('static', filename='images/gamer_paradise_icon.png') }}"
-                     width="30" height="30" alt="Gamer Paradise"
-                     class="d-inline-block align-text-top me-2">Gamer Paradise
-            </a>
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="#" class="nav-link px-0 text-white mx-4 me-3">
-                    <iconify-icon class="me-1" icon="clarity:shopping-bag-solid"></iconify-icon>
-                    Товары</a></li> {# TODO: исправить ссылку #}
-                <li><a href="#" class="nav-link px-0 text-white me-3">
-                    <iconify-icon class="me-1" icon="ant-design:star-filled"></iconify-icon>
-                    Избранное</a></li> {# TODO: исправить ссылку #}
-                <li><a href="#" class="nav-link px-0 text-white me-3">
-                    <iconify-icon class="me-1" icon="clarity:shopping-cart-solid"></iconify-icon>
-                    Корзина</a></li> {# TODO: исправить ссылку #}
+        <a class="navbar-brand text-white me-5" href="{{ url_for('main') }}">
+            <img src="{{ url_for('static', filename='images/gamer_paradise_icon.png') }}"
+                 width="30" height="30" alt="Gamer Paradise"
+                 class="align-text-top me-2">Gamer Paradise
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav d-inline-flex">
+                {{ nav_link('Товары', 'clarity:shopping-bag-solid') }} {# TODO: исправить ссылку #}
+                {{ nav_link('Избранное', 'ant-design:star-filled') }} {# TODO: исправить ссылку #}
+                {{ nav_link('Корзина', 'clarity:shopping-cart-solid') }} {# TODO: исправить ссылку #}
                 {% if g.user and g.user.role == 'admin' %} {# TODO: поработать над условием #}
-                    <li><a href="#" class="nav-link px-0 text-white me-3">
-                        <iconify-icon class="me-1" icon="material-symbols:add-business-rounded">
-                        </iconify-icon>Добавить товар</a></li> {# TODO: исправить ссылку #}
+                    {{ nav_link('Добавить товар', 'material-symbols:add-business-rounded', 'text-nowrap') }}
                 {% endif %}
-            </ul>
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex" method="get">
-                <input type="search" class="form-control form-control-dark text-white me-2"
-                       placeholder="Поиск товаров" aria-label="Search">
-                <button class="btn btn-outline-secondary icon" type="submit">
-                    <iconify-icon icon="fa-solid:search"></iconify-icon></button> {# TODO: исправить нажатие #}
-            </form>
-            <div class="text-end">
-                <button type="button" class="btn btn-light me-2">Зарегистрироваться</button> {# TODO: исправить нажатие #}
-                <button type="button" class="btn btn-outline-light me-2">Войти</button> {# TODO: исправить нажатие #}
             </div>
+            <form class="d-flex ms-auto my-2" role="search">
+                <input class="form-control me-2 form-control-dark text-white w-auto"
+                       type="search" placeholder="Поиск товаров" aria-label="Search">
+                <button class="btn btn-outline-secondary icon me-3">  {# TODO: исправить нажатие #}
+                    {{ icon('fa-solid:search') }}
+                </button>
+            </form>
+            <button class="btn btn-light me-2 my-2" type="button"
+                    onclick="window.location='{{ url_for('auth.register') }}'">Зарегистрироваться
+            </button>
+            <button class="btn btn-outline-light me-2" type="button">Войти</button> {# TODO: исправить ссылку #}
         </div>
     </div>
 </nav>
