@@ -7,7 +7,6 @@ photo VARCHAR(127) NOT NULL DEFAULT 'static/images/default_game.png',
 platform VARCHAR(20) NOT NULL,
 developer VARCHAR(127) NOT NULL,
 release_date DATE NOT NULL,
-rating NUMERIC(3, 1) CHECK (rating BETWEEN 0 AND 5) NOT NULL DEFAULT 0,
 in_stock INT CHECK (in_stock >= 0) NOT NULL
 );
 
@@ -39,7 +38,7 @@ date timestamptz NOT NULL DEFAULT now(),
 amount NUMERIC(14, 2) CHECK (amount >= 0) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS orders_products (
+CREATE TABLE IF NOT EXISTS orders_games (
 order_id BIGINT REFERENCES orders ON UPDATE CASCADE ON DELETE CASCADE,
 game_id BIGINT REFERENCES games ON UPDATE CASCADE ON DELETE SET NULL,
 quantity INT CHECK (quantity > 0),

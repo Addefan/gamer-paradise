@@ -7,6 +7,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'secret')
+    DEBUG = os.environ.get('DEBUG', True)
 
     POSTGRES_DB = os.environ.get('POSTGRES_DB', 'postgres')
     POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')

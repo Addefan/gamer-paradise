@@ -1,11 +1,15 @@
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap5
 
-import config
+import database as db
+from auth import auth
+from config import Config
 
 app = Flask(__name__)
+app.config.from_object(Config)
 bootstrap = Bootstrap5(app)
-app.config.from_object(config)
+app.register_blueprint(auth)
+db.init_app(app)
 
 
 @app.route('/')

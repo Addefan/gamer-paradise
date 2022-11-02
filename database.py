@@ -1,13 +1,39 @@
+import click
 import psycopg2
 import psycopg2.extras
+from flask import g
 
 from config import Config
 
 
-def create_database(script_path):
-    db = Database()
+def get_db():
+    if 'db' not in g:
+        g.db = Database()
+    return g.db
+
+
+def close_db(e=None):
+    db = g.pop('db', None)
+    if db is not None:
+        db.cursor.close()
+        db.connection.close()
+
+
+def init_db(script_path):
+    db = get_db()
     with open(script_path, encoding='utf-8') as file:
         db.create(file.read())
+
+
+@click.command('init-db')
+def init_db_command(script_path='database.sql'):
+    init_db(script_path)
+    click.echo('База данных инициализирована')
+
+
+def init_app(app):
+    app.teardown_appcontext(close_db)
+    app.cli.add_command(init_db_command)
 
 
 class Database:
@@ -35,7 +61,3 @@ class Database:
     def insert(self, query, values):
         self.cursor.execute(query, values)
         self.connection.commit()
-
-
-if __name__ == "__main__":
-    create_database('database.sql')
