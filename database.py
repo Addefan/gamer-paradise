@@ -51,8 +51,8 @@ class Database:
         self.cursor.execute(query)
         self.connection.commit()
 
-    def select(self, query):
-        self.cursor.execute(query)
+    def select(self, query, values=None):
+        self.cursor.execute(query, values)
         data = self.cursor.fetchall()
         if len(data) == 1:
             data = data[0]
