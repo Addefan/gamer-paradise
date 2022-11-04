@@ -58,7 +58,7 @@ class LoginView(MethodView):
             password = form.password.data
             remember = form.remember.data
             db = get_db()
-            user = db.select(f"SELECT * FROM users WHERE email = '%s'", (email,))
+            user = db.select(f'SELECT * FROM users WHERE email = %s', (email,))
             if user and check_password_hash(user['password'], password):
                 user = UserLogin().get_user(db, email=email)
                 login_user(user, remember)
