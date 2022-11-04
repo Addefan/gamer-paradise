@@ -39,3 +39,7 @@
     transform-origin: left;
     transform: scaleX(1);
 }
+
+.profile-icon {
+    vertical-align: -0.125em;
+}

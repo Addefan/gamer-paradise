@@ -38,9 +38,24 @@
                 </button>
             </form>
             <button class="btn btn-light me-2 my-2" type="button"
-                    onclick="window.location='{{ url_for('auth.register') }}'">Зарегистрироваться
+                    {% if current_user.is_authenticated %}
+                        onclick="window.location='#'"> {# TODO: исправить ссылку на профиль #}
+                        {{ icon('fa-solid:user', 'profile-icon') }}
+                        {{ current_user.user.name|default('Профиль', True) }}
+                    {% else %}
+                        onclick="window.location='{{ url_for('auth.register') }}'">
+                        Зарегистрироваться
+                    {% endif %}
             </button>
-            <button class="btn btn-outline-light me-2" type="button">Войти</button> {# TODO: исправить ссылку #}
+            <button class="btn btn-outline-light me-2" type="button"
+                {% if current_user.is_authenticated %}
+                    onclick="window.location='{{ url_for('auth.logout') }}'">
+                    Выйти
+                {% else %}
+                    onclick="window.location='{{ url_for('auth.login') }}'">
+                    Войти
+                {% endif %}
+            </button>
         </div>
     </div>
 </nav>
