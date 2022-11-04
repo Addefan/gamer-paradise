@@ -37,10 +37,8 @@ class RegisterView(MethodView):
             except errors.lookup(UNIQUE_VIOLATION):
                 form.email.errors.append('Пользователь с такой почтой уже существует')
             else:
-                user = UserLogin().get_user(db, email=email)
-                login_user(user)
                 flash('Вы успешно зарегистрированы', 'success')
-                return redirect(url_for('login'))
+                return redirect(url_for('.login'))
         return render_template('auth/auth.html', action='Регистрация', form=form)
 
 
