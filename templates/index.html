@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-3">
+    <img src="{{ url_for('static', filename='images/favicon.ico') }}"
+         alt="Gamer Paradise" class="rounded img-thumbnail ms-3">
+</div>
+<div class="col-md-6">
+    <div class="h4 float-left ms-3">
+        <strong>Gamer Paradise</strong> - это интернет-магазин видеоигр для различных
+        платформ: PC, Playstation, Xbox и других
+    </div>
+</div>
+<div class="col-md-3"></div>
+{% endblock %}

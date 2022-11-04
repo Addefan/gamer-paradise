@@ -20,7 +20,7 @@ class RegisterView(MethodView):
     def get(self):
         if current_user.is_authenticated:
             flash('Вы уже зарегистрированы', 'warning')
-            return redirect(url_for('main'))  # TODO изменить ссылку на профиль
+            return redirect(url_for('index'))  # TODO изменить ссылку на профиль
 
         form = RegisterForm()
         return render_template('auth/auth.html', action='Регистрация', form=form)
@@ -46,7 +46,7 @@ class LoginView(MethodView):
     def get(self):
         if current_user.is_authenticated:
             flash('Вы уже авторизованы', 'warning')
-            return redirect(url_for('main'))  # TODO изменить ссылку на профиль
+            return redirect(url_for('index'))  # TODO изменить ссылку на профиль
 
         form = LoginForm()
         return render_template('auth/auth.html', action='Авторизация', form=form)
@@ -63,7 +63,7 @@ class LoginView(MethodView):
                 user = UserLogin().get_user(db, email=email)
                 login_user(user, remember)
                 flash('Вы успешно авторизованы', 'success')
-                return redirect(request.args.get('next') or url_for('main'))  # TODO: исправить редирект на товары
+                return redirect(request.args.get('next') or url_for('index'))  # TODO: исправить редирект на товары
             else:
                 form.email.errors.append('Неверный адрес электронной почты или пароль')
                 form.password.errors.append('Неверный адрес электронной почты или пароль')

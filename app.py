@@ -15,8 +15,8 @@ def create_app(config=Config):
     register_blueprints(app)
 
     @app.route('/')
-    def main():
-        return render_template('base.html')
+    def index():
+        return render_template('index.html')
 
     return app
 
