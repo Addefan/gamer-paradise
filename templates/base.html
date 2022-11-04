@@ -10,11 +10,13 @@
     <title>{% block title %}Gamer Paradise{% endblock %}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}?">
 </head>
+
 <body>
 {% block navbar %}
     {% include 'navbar.html' %}
 {% endblock %}
-{% block content %}
+
+{% block flash %}
     {% from 'bootstrap5/utils.html' import render_messages %}
     <div class="container">
         <div class="row">
@@ -23,6 +25,11 @@
                 {{ render_messages(dismissible=True) }}
             </div>
         </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
         <div class="row">
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/favicon.ico') }}"
@@ -30,14 +37,16 @@
             </div>
             <div class="h4 float-left col-md-6 ms-3">
                 <strong>Gamer Paradise</strong> - это интернет-магазин видеоигр для различных
-                платформ: PC, Plastation, Xbox и других
+                платформ: PC, Playstation, Xbox и других
             </div>
         </div>
     </div>
 {% endblock %}
+
 {% block script %}
     {{ bootstrap.load_js() }}
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.1/dist/iconify-icon.min.js"></script>
 {% endblock %}
+
 </body>
 </html>
