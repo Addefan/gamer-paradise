@@ -76,4 +76,4 @@ class LogoutView(MethodView):
     def get(self):
         logout_user()
         flash('Вы успешно вышли из аккаунта', 'success')
-        return redirect(url_for('.login'))
+        return redirect(request.referrer)
