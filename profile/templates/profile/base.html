@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from 'navbar.html' import icon with context %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{{ url_for('.personal') }}"
+               class="list-group-item list-group-item-action{% if page == 'personal' %} active{% endif %}">
+                {{ icon('fluent:person-info-20-filled', 'sidebar-icon profile-icon') }} Личные данные
+            </a>
+            <a href="{{ url_for('.orders') }}"
+               class="list-group-item list-group-item-action{% if page == 'orders' %} active{% endif %}">
+                {{ icon('akar-icons:shipping-box-01', 'sidebar-icon profile-icon') }} История заказов
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            {% block card_content %}{% endblock %}
+        </div>
+    </div>
+    <div class="col-md-3"></div>
+{% endblock %}

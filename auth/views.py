@@ -20,7 +20,7 @@ class RegisterView(MethodView):
     def get(self):
         if current_user.is_authenticated:
             flash('Вы уже зарегистрированы', 'warning')
-            return redirect(url_for('index'))  # TODO изменить ссылку на профиль
+            return redirect(url_for('profile.index'))
 
         form = RegisterForm()
         return render_template('auth/auth.html', action='Регистрация', form=form)
@@ -46,7 +46,7 @@ class LoginView(MethodView):
     def get(self):
         if current_user.is_authenticated:
             flash('Вы уже авторизованы', 'warning')
-            return redirect(url_for('index'))  # TODO изменить ссылку на профиль
+            return redirect(url_for('profile.index'))
 
         form = LoginForm()
         return render_template('auth/auth.html', action='Авторизация', form=form)

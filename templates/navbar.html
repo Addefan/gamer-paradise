@@ -39,7 +39,7 @@
             </form>
             <button class="btn btn-light me-2 my-2" type="button"
                     {% if current_user.is_authenticated %}
-                        onclick="window.location='#'"> {# TODO: исправить ссылку на профиль #}
+                        onclick="window.location='{{ url_for('profile.index') }}'">
                         {{ icon('fa-solid:user', 'profile-icon') }}
                         {{ current_user.user.name|default('Профиль', True) }}
                     {% else %}
