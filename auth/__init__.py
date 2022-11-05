@@ -6,7 +6,7 @@ auth = Blueprint('auth', __name__, template_folder='templates')
 
 from auth import views
 
-login_manager.login_view = '.login'
+login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Чтобы просмотреть эту страницу, необходимо авторизоваться'
 login_manager.login_message_category = 'error'
 
