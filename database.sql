@@ -7,7 +7,8 @@ photo VARCHAR(127) NOT NULL DEFAULT 'static/images/default_game.png',
 platform VARCHAR(20) NOT NULL,
 developer VARCHAR(127) NOT NULL,
 release_date DATE NOT NULL,
-in_stock INT CHECK (in_stock >= 0) NOT NULL
+in_stock INT CHECK (in_stock >= 0) NOT NULL,
+is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS users (
