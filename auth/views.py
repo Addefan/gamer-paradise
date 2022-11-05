@@ -8,10 +8,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from auth.forms import RegisterForm, LoginForm
 from auth.user_login import UserLogin
 from database import get_db
-from extensions import lm
+from extensions import login_manager
 
 
-@lm.user_loader
+@login_manager.user_loader
 def load_user(user_id):
     return UserLogin().get_user(get_db(), user_id=user_id)
 

@@ -4,7 +4,7 @@ import database as db
 from auth import auth
 from config import Config
 
-from extensions import bootstrap, lm
+from extensions import bootstrap, login_manager
 from profile import profile
 
 
@@ -24,7 +24,7 @@ def create_app(config=Config):
 
 def register_extensions(app):
     bootstrap.init_app(app)
-    lm.init_app(app)
+    login_manager.init_app(app)
     db.init_app(app)
 
 
