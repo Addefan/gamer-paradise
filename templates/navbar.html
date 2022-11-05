@@ -44,16 +44,16 @@
                         {{ current_user.user.name|default('Профиль', True) }}
                     {% else %}
                         onclick="window.location='{{ url_for('auth.register') }}'">
-                        Зарегистрироваться
+                        {{ icon('fa:user-plus', 'profile-icon') }} Зарегистрироваться
                     {% endif %}
             </button>
             <button class="btn btn-outline-light me-2" type="button"
                 {% if current_user.is_authenticated %}
                     onclick="window.location='{{ url_for('auth.logout') }}'">
-                    Выйти
+                    {{ icon('mdi:logout', 'profile-icon') }} Выйти
                 {% else %}
                     onclick="window.location='{{ url_for('auth.login') }}'">
-                    Войти
+                    {{ icon('mdi:login', 'profile-icon') }} Войти
                 {% endif %}
             </button>
         </div>
