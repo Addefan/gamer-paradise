@@ -5,6 +5,7 @@ from auth import auth
 from config import Config
 
 from extensions import bootstrap, lm
+from profile import profile
 
 
 def create_app(config=Config):
@@ -29,6 +30,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     app.register_blueprint(auth)
+    app.register_blueprint(profile, url_prefix='/profile')
 
 
 if __name__ == "__main__":
