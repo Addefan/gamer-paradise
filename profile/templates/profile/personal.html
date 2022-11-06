@@ -1,0 +1,51 @@
+{% extends 'profile/base.html' %}
+
+{% macro modal(title, body, btn_classes='btn-primary', btn_text='Ок') %}
+    <div class="modal fade" id="delete" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">{{ title }}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ body|safe }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Отмена
+                </button>
+                <button type="button" class="btn {{ btn_classes }}">{{ btn_text }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% block title %}Личные данные{% endblock %}
+
+{% block card_content %}
+    <div class="card-body">
+        <h4 class="card-title">Информация об аккаунте</h4>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item py-3">
+            <h4 class="card-title">Удаление аккаунта</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-8">
+                    <p class="card-text">Удалить аккаунт Gamer Paradise, включая личную информацию,
+                        избранные товары, товары в корзине, заказы и оценки товаров.</p>
+                </div>
+                <div class="col-md-4 d-flex align-items-center justify-content-center">
+                    <button type="button" class="btn btn-danger"
+                            data-bs-toggle="modal" data-bs-target="#delete">Удалить аккаунт
+                    </button>
+                    {{ modal('Удаление аккаунта', 'Вы действительно хотите удалить аккаунт?<br>
+                    Аккаунт будет удалён безвозвратно.', 'btn-danger', 'Удалить аккаунт') }}
+                </div>
+            </div>
+        </li>
+    </ul>
+{% endblock %}

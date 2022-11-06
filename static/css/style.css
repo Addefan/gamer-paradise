@@ -47,3 +47,11 @@
 body {
     background: #f8f8f8;
 }
+
+.sidebar-icon {
+    font-size: 1.3em;
+}
+
+hr {
+    color: var(--bs-secondary);
+}
