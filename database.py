@@ -61,3 +61,5 @@ class Database:
     def insert(self, query, values):
         self.cursor.execute(query, values)
         self.connection.commit()
+
+    delete = insert

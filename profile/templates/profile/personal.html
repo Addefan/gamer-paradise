@@ -1,6 +1,6 @@
 {% extends 'profile/base.html' %}
 
-{% macro modal(title, body, btn_classes='btn-primary', btn_text='Ок') %}
+{% macro modal(title, body, btn_classes='btn-primary', btn_text='Ок', onclick_path='') %}
     <div class="modal fade" id="delete" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -16,7 +16,11 @@
                 <button type="button" class="btn btn-secondary"
                         data-bs-dismiss="modal">Отмена
                 </button>
-                <button type="button" class="btn {{ btn_classes }}">{{ btn_text }}</button>
+                <button type="button" class="btn {{ btn_classes }}"
+                        {% if onclick_path %}
+                        onclick="window.location='{{ onclick_path }}'"
+                        {% endif %}
+                >{{ btn_text }}</button>
             </div>
         </div>
     </div>
@@ -43,7 +47,8 @@
                             data-bs-toggle="modal" data-bs-target="#delete">Удалить аккаунт
                     </button>
                     {{ modal('Удаление аккаунта', 'Вы действительно хотите удалить аккаунт?<br>
-                    Аккаунт будет удалён безвозвратно.', 'btn-danger', 'Удалить аккаунт') }}
+                    Аккаунт будет удалён безвозвратно.', 'btn-danger', 'Удалить аккаунт',
+                    url_for('.delete')) }}
                 </div>
             </div>
         </li>
