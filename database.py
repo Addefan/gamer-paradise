@@ -63,3 +63,4 @@ class Database:
         self.connection.commit()
 
     delete = insert
+    update = insert
