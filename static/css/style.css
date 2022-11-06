@@ -62,3 +62,7 @@ hr {
     background-color: #212529;
     border-color: #212529;
 }
+
+.form-label[for='reset'] {
+    display: none
+}

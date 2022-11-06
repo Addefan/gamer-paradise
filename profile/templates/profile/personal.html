@@ -1,4 +1,5 @@
 {% extends 'profile/base.html' %}
+{% from 'bootstrap5/form.html' import render_field, render_form_row %}
 
 {% macro modal(title, body, btn_classes='btn-primary', btn_text='Ок', onclick_path='') %}
     <div class="modal fade" id="delete" tabindex="-1">
@@ -32,6 +33,14 @@
 {% block card_content %}
     <div class="card-body">
         <h4 class="card-title">Информация об аккаунте</h4>
+        <hr>
+        <form method="post">
+            {{ form.csrf_token() }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.name) }}
+            {{ render_form_row([form.reset, form.submit], row_class='row justify-content-end mt-4',
+            col_class_default='w-auto', button_style='dark float-end', form_type=inline) }}
+        </form>
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item py-3">
