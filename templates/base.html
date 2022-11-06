@@ -5,7 +5,7 @@
     <meta name="description" content="Интернет-магазин видеоигр">
     {% block styles %}
         {{ bootstrap.load_css() }}
-        <link rel="stylesheet" href="../static/css/style.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% endblock %}
     <title>{% block title %}Gamer Paradise{% endblock %}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}?">
