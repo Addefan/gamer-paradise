@@ -66,3 +66,18 @@ class DeleteAccountView(MethodView):
         db.delete('DELETE FROM users WHERE id = %s', (user_id,))
         flash('Ваш аккаунт успешно удалён', 'success')
         return redirect(request.referrer)
+
+
+class OrderView(MethodView):
+    decorators = [login_required]
+
+    def get(self, order_id):
+        db = get_db()
+        order = db.select('SELECT * FROM orders WHERE id = %s', (order_id,))
+        if not order['user_id'] == current_user.user['id']:
+            return redirect(url_for('profile.orders'))
+        games = db.select('SELECT game_id, title, photo, og.price, quantity FROM orders_games og '
+                          'JOIN games g ON og.game_id = g.id WHERE order_id = %s', (order_id,))
+        if not isinstance(games, list):
+            games = [games]
+        return render_template('order.html', page='orders', order=order, games=games)
