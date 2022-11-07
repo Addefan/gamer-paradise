@@ -80,4 +80,4 @@ class OrderView(MethodView):
                           'JOIN games g ON og.game_id = g.id WHERE order_id = %s', (order_id,))
         if not isinstance(games, list):
             games = [games]
-        return render_template('order.html', page='orders', order=order, games=games)
+        return render_template('profile/order.html', page='orders', order=order, games=games)
