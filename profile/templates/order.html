@@ -1,0 +1,45 @@
+{% extends 'profile/base.html' %}
+
+{% block profile_content %}
+    <div class="card-body">
+        <h2 class="card-title">Заказ #{{ order.id }}
+            <span class="text-muted h4">от {{ order.date }}</span> {# TODO: сделать и применить фильтр date  #}
+        </h2>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item py-3">
+        <h4 class="card-subtitle text-muted">Товары</h4>
+        <hr>
+        {% for game in games %}
+            <div class="card mb-2 pointer" onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
+                <div class="row g-0">
+                    <div class="col-3">
+                        <img src="{{ game.photo }}" class="img-fluid rounded-start card-img-top">
+                    </div>
+                    <div class="col-9">
+                        <div class="card-body">
+                            <p class="card-text">{{ game.title }}</p>
+                            <p class="card-text bold">{{ game.price }} ₽
+                                <span class="card-text text-muted">x{{ game.quantity }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </li>
+        <li class="list-group-item py-3">
+            <h4 class="card-subtitle text-muted">Сумма заказа</h4>
+            <hr>
+            {% for game in games %}
+                <div>
+                    <span class="card-text">{{ game.title }}</span>
+                    <p class="card-text float-end">{{ game.price * game.quantity }} ₽</p>
+                </div>
+            {% endfor %}
+            <span class="card-text h5">Итого</span>
+            <p class="card-text float-end h5">{{ order.amount }} ₽</p>
+        </li>
+    </ul>
+    </div>
+{% endblock %}

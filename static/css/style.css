@@ -70,3 +70,13 @@ hr {
 .vl {
     border-left: 1px solid #dfdfdf;
 }
+
+.pointer {
+    cursor: pointer;
+}
+
+.card-img-top {
+    height: 100%;
+    width: 7vw;
+    object-fit: cover;
+}
