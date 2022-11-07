@@ -66,3 +66,7 @@ hr {
 .form-label[for='reset'] {
     display: none
 }
+
+.vl {
+    border-left: 1px solid #dfdfdf;
+}

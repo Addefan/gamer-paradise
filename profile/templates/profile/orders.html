@@ -1,0 +1,28 @@
+{% extends 'profile/base.html' %}
+
+{% block title %}История заказов{% endblock %}
+
+{% block profile_content %}
+    <div class="card-body">
+    <h4 class="card-title">Заказы</h4>
+    <hr>
+    {% for order, games_titles in orders_games_titles %}
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-9">
+                    <div class="card-body">
+                        <p class="card-text mb-1">
+                            <small class="text-muted">{{ order.date }}</small>
+                        </p>
+                        <h5 class="card-title">Заказ #{{ order.id }}</h5>
+                        <p class="card-text">{{ games_titles|join(', ')|truncate(40) }}</p>
+                    </div>
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-center vl p-3">
+                    <strong>{{ order.amount }} ₽</strong>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}
