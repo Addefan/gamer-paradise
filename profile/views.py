@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, flash, request
 from flask.views import MethodView
 from flask_login import login_required, logout_user, current_user
 
-from database import get_db, db_dict_to_list
+from database import get_db
 from profile import profile
 from profile.forms import ChangeDataForm
 
@@ -45,12 +45,9 @@ class OrdersView(MethodView):
             orders = [orders]
         orders_games_titles = []
         for order in orders:
-            games_ids = [db_dict_to_list('game_id', db.select('SELECT game_id FROM orders_games '
-                                                              'WHERE order_id = %s',
-                                                              (order['id'],)))]
-            games_titles = db_dict_to_list('title', db.select('SELECT title FROM games '
-                                                              'WHERE id = ANY(%s)',
-                                                              (games_ids, )))
+            games_titles = db.select('SELECT ARRAY(SELECT title FROM games g '
+                                     'JOIN orders_games og on g.id = og.game_id '
+                                     'WHERE order_id = %s)', (order['id'],))['array']
             orders_games_titles.append((order, games_titles))
         return render_template('profile/orders.html', page='orders',
                                orders_games_titles=orders_games_titles)

@@ -36,10 +36,6 @@ def init_app(app):
     app.cli.add_command(init_db_command)
 
 
-def db_dict_to_list(column_name, data):
-    return [row[column_name] for row in data]
-
-
 class Database:
     def __init__(self):
         self.connection = psycopg2.connect(
