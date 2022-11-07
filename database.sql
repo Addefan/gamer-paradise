@@ -3,7 +3,7 @@ id BIGSERIAL PRIMARY KEY,
 title VARCHAR(255) NOT NULL,
 description TEXT,
 price NUMERIC(14, 2) CHECK (price >= 0) NOT NULL DEFAULT 0,
-photo VARCHAR(127) NOT NULL DEFAULT 'static/images/default_game.png',
+photo VARCHAR(127) NOT NULL DEFAULT '/static/images/default_game.png',
 platform VARCHAR(20) NOT NULL,
 developer VARCHAR(127) NOT NULL,
 release_date DATE NOT NULL,
@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS orders_games (
 order_id BIGINT REFERENCES orders ON UPDATE CASCADE ON DELETE CASCADE,
 game_id BIGINT REFERENCES games ON UPDATE CASCADE ON DELETE SET NULL,
 quantity INT CHECK (quantity > 0),
+price NUMERIC(14, 2) CHECK (price >= 0) NOT NULL DEFAULT 0,
 PRIMARY KEY(order_id, game_id)
 );
 
