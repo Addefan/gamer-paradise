@@ -4,7 +4,7 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-    <div class="col-md-3">
+    <div class="col-3">
         <div class="list-group">
             <a href="{{ url_for('.personal') }}"
                class="list-group-item list-group-item-action{% if page == 'personal' %} active{% endif %}">
@@ -16,10 +16,10 @@
             </a>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-6">
+        <div class="card mb-3">
             {% block profile_content %}{% endblock %}
         </div>
     </div>
-    <div class="col-md-3"></div>
+    <div class="col-3"></div>
 {% endblock %}
