@@ -3,7 +3,7 @@
 {% block profile_content %}
     <div class="card-body">
         <h2 class="card-title">Заказ #{{ order.id }}
-            <span class="text-muted h4">от {{ order.date }}</span> {# TODO: сделать и применить фильтр date  #}
+            <span class="text-muted h4">от {{ order.date|date('d B Y') }}</span>
         </h2>
     </div>
     <ul class="list-group list-group-flush">
@@ -14,7 +14,8 @@
             <div class="card mb-2 pointer" onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
                 <div class="row g-0">
                     <div class="col-3">
-                        <img src="{{ game.photo }}" class="img-fluid rounded-start card-img-top">
+                        <img src="{{ game.photo }}" class="img-fluid rounded-start card-img-top"
+                        alt="{{ game.title }}">
                     </div>
                     <div class="col-9">
                         <div class="card-body">
@@ -41,5 +42,4 @@
             <p class="card-text float-end h5">{{ order.amount }} ₽</p>
         </li>
     </ul>
-    </div>
 {% endblock %}

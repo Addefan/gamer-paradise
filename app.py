@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 
 import database as db
+import filters
 from auth import auth
 from config import Config
 
@@ -14,6 +15,7 @@ def create_app(config=Config):
 
     register_extensions(app)
     register_blueprints(app)
+    register_filters(app)
 
     @app.route('/')
     def index():
@@ -31,6 +33,10 @@ def register_extensions(app):
 def register_blueprints(app):
     app.register_blueprint(auth)
     app.register_blueprint(profile, url_prefix='/profile')
+
+
+def register_filters(app):
+    app.add_template_filter(filters.date, 'date')
 
 
 if __name__ == "__main__":
