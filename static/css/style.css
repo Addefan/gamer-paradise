@@ -80,3 +80,7 @@ hr {
     width: 7vw;
     object-fit: cover;
 }
+
+.personal-icon {
+    font-size: 1.5rem;
+}
