@@ -6,6 +6,7 @@ from auth import auth
 from config import Config
 
 from extensions import bootstrap, login_manager
+from games import games
 from profile import profile
 
 
@@ -33,6 +34,7 @@ def register_extensions(app):
 def register_blueprints(app):
     app.register_blueprint(auth)
     app.register_blueprint(profile, url_prefix='/profile')
+    app.register_blueprint(games, url_prefix='/games')
 
 
 def register_filters(app):
