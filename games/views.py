@@ -10,6 +10,22 @@ from database import get_db
 from games.forms import CreateGameForm
 
 
+class GamesView(MethodView):
+    def get(self):
+        db = get_db()
+        user_id = current_user.user['id'] if not current_user.is_anonymous else 0
+        platforms = request.args.getlist('platform')
+        query = ('SELECT *, EXISTS (SELECT true FROM favorites '
+                 'WHERE game_id = id AND user_id = %s) AS is_favorite '
+                 'FROM games WHERE is_deleted = false')
+        vals = [user_id]
+        if platforms:
+            query += ' AND platform = ANY(%s)'
+            vals += [platforms]
+        games = db.select(query, vals)
+        return render_template('games/games.html', games=games)
+
+
 class CreateGameView(MethodView):
     decorators = [login_required]
 
