@@ -84,3 +84,9 @@ hr {
 .personal-icon {
     font-size: 1.5rem;
 }
+
+.order-game {
+    max-height: 6.5rem;
+    max-width: 100%;
+    object-fit: cover;
+}
