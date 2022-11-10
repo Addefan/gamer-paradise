@@ -13,7 +13,7 @@
                     <div class="col-9">
                         <div class="card-body">
                             <p class="card-text mb-1">
-                                <small class="text-muted">{{ order.date|date('d B Y') }}</small> {# TODO: сделать и применить фильтр date  #}
+                                <small class="text-muted">{{ order.date|date('d B Y') }}</small>
                             </p>
                             <h5 class="card-title">Заказ #{{ order.id }}</h5>
                             <p class="card-text">{{ games_titles|join(', ')|truncate(40) }}</p>
