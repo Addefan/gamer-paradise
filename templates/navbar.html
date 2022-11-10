@@ -27,7 +27,8 @@
                 {{ nav_link('Избранное', 'ant-design:star-filled') }} {# TODO: исправить ссылку #}
                 {{ nav_link('Корзина', 'clarity:shopping-cart-solid') }} {# TODO: исправить ссылку #}
                 {% if current_user.is_authenticated and current_user.user.role == 'admin' %}
-                    {{ nav_link('Добавить товар', 'material-symbols:add-business-rounded', 'text-nowrap') }}
+                    {{ nav_link('Добавить товар', 'material-symbols:add-business-rounded',
+                    'text-nowrap', url_for('games.add')) }}
                 {% endif %}
             </div>
             <form class="d-flex ms-auto my-2" role="search">
