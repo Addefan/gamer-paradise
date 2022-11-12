@@ -1,28 +1,77 @@
 {% extends 'base.html' %}
+{% from 'navbar.html' import icon with context %}
 
 {% block content %}
     <div class="card">
-    <div class="row">
-        <div class="col-9"><p class="mt-3 ms-2 mb-3 h5">Показать: </p></div>
-        <div class="col-3"><p class="mt-3 mb-3 h5">Фильтры</p></div>
-    </div>
+        <div class="row">
+            <div class="col-9">
+                <p class="mt-3 ms-2 mb-3 h5">Показать: {# TODO: сортировка по дате, названию, цене #}</p>
+            </div>
+            <div class="col-3">
+                <p class="mt-3 mb-3 h5">Фильтры</p>
+            </div>
+        </div>
         <div class="row">
             <div class="col-9 d-flex flex-wrap row-cols-sm-2 row-cols-xl-4">
                 {% for game in games %}
                     <div class="col px-2 pb-5">
-                    <div class="card pointer border-0 text-center">
-                        <img src="{{ game.photo }}" class="rounded game"
-                             alt="{{ game.title }}">
-                        <div class="card-body pb-0 pt-2">
-                            <p class="card-text mb-1">{{ game.title }}</p>
-                            <h5 class="card-title mb-0">{{ game.price }} ₽</h5>
+                        <div class="card pointer border-0 text-center">
+                            <div class="game-image-div">
+                                <div class="fav d-flex justify-content-center align-items-center">
+                                    <button type="button" id=game{{ game.id }} class="fav-button">
+                                        {% if game.is_favorite %}
+                                            {{ icon('mdi:cards-heart') }}
+                                        {% else %}
+                                            {{ icon('mdi:cards-heart-outline') }}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                                <img src="{{ game.photo }}" class="rounded game"
+                                     alt="{{ game.title }}">
+                            </div>
+                            <div class="card-body pb-0 pt-2">
+                                <p class="card-text mb-1">{{ game.title }}</p>
+                                <h5 class="card-title mb-0">{{ game.price }} ₽</h5>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 {% endfor %}
             </div>
             <div class="col-3">
+                {# TODO: фильрация по платформе и по разработчику #}
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+    <script>
+        $('.fav-button').on('click', function () {
+            $(this).prop('disabled', true);
+            setTimeout(function () {
+                $(this).prop('disabled', false);
+            }.bind(this), 1000);
+
+            let checked = $(this).children('iconify-icon').attr('icon') === 'mdi:cards-heart';
+            let game_id = this.id.substring(4);
+            let data = {'checked': checked, 'game_id': game_id};
+
+            let icons = ['mdi:cards-heart-outline', 'mdi:cards-heart'];
+            let old_icon = $(this).children('iconify-icon').attr('icon');
+            let new_icon = icons[old_icon === icons[0] ? 1 : 0];
+            $(this).children('iconify-icon').fadeOut(500, function () {
+                $(this).attr('icon', new_icon);
+                $(this).fadeIn(500);
+            });
+
+            $.ajax({
+                url: "{{ url_for('.change_favorite') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            })
+        });
+    </script>
 {% endblock %}

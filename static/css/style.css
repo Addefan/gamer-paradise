@@ -97,3 +97,39 @@ hr {
     object-fit: cover;
     align-self: center;
 }
+
+.fav {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-size: 2rem;
+    z-index: 1;
+    opacity: 0;
+}
+
+.game-image-div {
+    position: relative;
+}
+
+.game-image-div .fav, .game-image-div .game {
+    transition: 1s;
+}
+
+.game-image-div:hover .fav {
+    opacity: 1;
+    transition: 1s;
+}
+
+.game-image-div:hover .game {
+    opacity: 0.8;
+    transition: 1s;
+}
+
+.game-image-div iconify-icon {
+    filter: drop-shadow(0 0 0.6rem black) !important;
+}
+
+.fav-button {
+    all: unset;
+}

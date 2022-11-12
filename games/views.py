@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 
 from auth.enums import Role
 from database import get_db
+from games import games
 from games.forms import CreateGameForm
 
 
@@ -60,3 +61,15 @@ class CreateGameView(MethodView):
                        in_stock, is_deleted))
             return redirect(url_for('.index'))  # TODO: поменять на URL созданного товара
         return render_template('games/create_game.html', form=form)
+
+
+@games.route('/change_favorite')
+def change_favorite():
+    db = get_db()
+    user_id = current_user.user['id']
+    game_id = request.args.get('game_id')
+    if request.args.get('checked') == 'true':
+        db.delete('DELETE FROM favorites WHERE user_id = %s AND game_id = %s', (user_id, game_id))
+    else:
+        db.insert('INSERT INTO favorites (user_id, game_id) VALUES (%s, %s)', (user_id, game_id))
+    return {}
