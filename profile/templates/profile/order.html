@@ -1,5 +1,7 @@
 {% extends 'profile/base.html' %}
 
+{% block title %}Заказ #{{ order.id }}{% endblock %}
+
 {% block profile_content %}
     <div class="card-body">
         <h2 class="card-title">Заказ #{{ order.id }}
@@ -8,7 +10,7 @@
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item py-3">
-        <h4 class="card-subtitle text-muted">Товары</h4>
+        <h4 class="card-subtitle">Товары</h4>
         <hr>
         {% for game in games %}
             <div class="card mb-2 pointer" onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
@@ -30,7 +32,7 @@
         {% endfor %}
         </li>
         <li class="list-group-item py-3">
-            <h4 class="card-subtitle text-muted">Сумма заказа</h4>
+            <h4 class="card-subtitle">Сумма заказа</h4>
             <hr>
             {% for game in games %}
                 <div>
