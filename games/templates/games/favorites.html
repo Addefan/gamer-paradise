@@ -84,12 +84,17 @@
             e.stopPropagation();
 
             let game_id = this.id.substring(8);
-            let count = $('#game_count_' + game_id).val();
+            let input_count = $('#game_count_' + game_id);
+            let count = input_count.val();
+            if (!input_count[0].checkValidity()) {
+                input_count.css('border-color', 'red');
+                return;
+            }
             let data = {'checked': false, 'game_id': game_id, 'count': count}
 
             console.log('game_count_' + game_id);
 
-            $('#game_count_' + game_id).css('display', 'none');
+            input_count.css('display', 'none');
             $(this).text('Посмотреть в корзине');
             $(this).attr('onclick', "window.location=''" {# TODO: изменить ссылку на корзину #});
 
