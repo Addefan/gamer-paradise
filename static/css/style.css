@@ -126,10 +126,26 @@ hr {
     transition: 1s;
 }
 
-.game-image-div iconify-icon {
+.game-image-div iconify-icon, .close:hover iconify-icon {
     filter: drop-shadow(0 0 0.6rem black) !important;
 }
 
-.fav-button {
+.close iconify-icon, .close:hover iconify-icon {
+    transition: 1s;
+}
+
+.fav-button, .close {
     all: unset;
+}
+
+.fav-game {
+    max-height: 10rem;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.game-count {
+    width: 3rem;
+    border: none;
+    border-bottom: 2px solid var(--bs-secondary);
 }

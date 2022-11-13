@@ -73,3 +73,28 @@ def change_favorite():
     else:
         db.insert('INSERT INTO favorites (user_id, game_id) VALUES (%s, %s)', (user_id, game_id))
     return {}
+
+
+@games.route('/favorites')
+def favorites():
+    db = get_db()
+    user_id = current_user.user['id']
+    games_list = db.select('SELECT *, EXISTS (SELECT true FROM carts '
+                           'WHERE game_id = id AND user_id = %s) AS in_cart '
+                           'FROM (SELECT game_id FROM favorites f WHERE user_id = %s) f '
+                           'JOIN games g ON g.id = f.game_id', (user_id, user_id))
+    return render_template('games/favorites.html', games=games_list)
+
+
+@games.route('/change_cart')
+def change_cart():
+    db = get_db()
+    user_id = current_user.user['id']
+    game_id = request.args.get('game_id')
+    if request.args.get('checked') == 'true':
+        db.delete('DELETE FROM carts WHERE user_id = %s AND game_id = %s', (user_id, game_id))
+    else:
+        count = request.args.get('count')
+        db.insert('INSERT INTO carts (user_id, game_id, quantity) VALUES (%s, %s, %s)',
+                  (user_id, game_id, count))
+    return {}

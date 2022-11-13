@@ -1,0 +1,104 @@
+{% extends 'games/base.html' %}
+{% from 'navbar.html' import icon with context %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block games_content %}
+    <div class="col-9">
+        <div class="card-body">
+            {% for game in games %}
+                <div class="card mb-3 pointer" id=game{{ game.id }} onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
+                    <div class="row g-0">
+                        <div class="col-3 align-self-center">
+                            <img src="/{{ game.photo }}" class="rounded fav-game"
+                            alt="{{ game.title }}">
+                        </div>
+                        <div class="col-9">
+                            <div class="card-body">
+                                <p class="card-text">{{ game.title }}</p>
+                                <button type="button" class="close position-absolute top-0 end-0
+                                mt-3 me-3" id="game_close_{{ game.id }}">
+                                    {{ icon('fluent-emoji-high-contrast:cross-mark') }}
+                                </button>
+                                <p class="card-text bold position-absolute bottom-0 mb-4">
+                                    {{ game.price }} ₽
+                                </p>
+                                <div class="position-absolute bottom-0 end-0 me-3 mb-3
+                                d-flex align-items-center">
+                                    {% if game.in_cart %}
+                                        <button type="button" class="btn btn-dark"
+                                                onclick="window.location=''"> {# TODO: изменить ссылку на корзину #}
+                                            Посмотреть в корзине
+                                        </button>
+                                    {% else %}
+                                        <input class="game-count me-2 text-center" type="number"
+                                               min="1" value="1" max="{{ game.in_stock }}"
+                                               id="game_count_{{ game.id }}">
+                                        <button type="button" class="btn btn-dark to-cart"
+                                        id="to_cart_{{ game.id }}">
+                                            Добавить в корзину
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        $(".game-count").click(function (e) {
+            e.stopImmediatePropagation();
+        });
+
+        $(".close").on('click', function (e) {
+            e.stopPropagation();
+            $(this).prop('disabled', true);
+            setTimeout(function () {
+                $(this).prop('disabled', false);
+            }.bind(this), 1000);
+
+            let game_id = this.id.substring(11);
+            let data = {'checked': true, 'game_id': game_id}
+
+            $('#game' + game_id).css({'opacity': 0, 'transition': '1s'});
+            setTimeout(function () {
+                $('#game' + game_id).css('display', 'none');
+            }, 1000);
+
+
+            $.ajax({
+                url: "{{ url_for('.change_favorite') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            })
+        })
+
+        $(".to-cart").on('click', function (e) {
+            e.stopPropagation();
+
+            let game_id = this.id.substring(8);
+            let count = $('#game_count_' + game_id).val();
+            let data = {'checked': false, 'game_id': game_id, 'count': count}
+
+            console.log('game_count_' + game_id);
+
+            $('#game_count_' + game_id).css('display', 'none');
+            $(this).text('Посмотреть в корзине');
+            $(this).attr('onclick', "window.location=''" {# TODO: изменить ссылку на корзину #});
+
+            $.ajax({
+                url: "{{ url_for('.change_cart') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            })
+        })
+    </script>
+{% endblock %}
