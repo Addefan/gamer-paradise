@@ -1,6 +1,6 @@
 from os import path
 
-from flask import render_template, request, current_app, redirect, url_for
+from flask import render_template, request, current_app, redirect, url_for, flash
 from flask.views import MethodView
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
@@ -85,6 +85,8 @@ def favorites():
                            'WHERE game_id = id AND user_id = %s) AS in_cart '
                            'FROM (SELECT game_id FROM favorites f WHERE user_id = %s) f '
                            'JOIN games g ON g.id = f.game_id', (user_id, user_id))
+    if not isinstance(games_list, list):
+        games_list = [games_list]
     return render_template('games/favorites.html', games=games_list)
 
 
@@ -111,6 +113,8 @@ def cart():
     games_list = db.select('SELECT * FROM '
                            '(SELECT game_id, quantity FROM carts c WHERE user_id = %s) c '
                            'JOIN games g ON g.id = c.game_id', (user_id,))
+    if not isinstance(games_list, list):
+        games_list = [games_list]
     return render_template('games/cart.html', games=games_list)
 
 
@@ -124,3 +128,25 @@ def change_count_cart():
     db.update('UPDATE carts SET quantity = %s WHERE user_id = %s AND game_id = %s',
               (count, user_id, game_id))
     return {}
+
+
+@games.route('/cart/make_order')
+@login_required
+def make_order():
+    db = get_db()
+    user_id = current_user.user['id']
+    amount = db.select('SELECT sum(price * quantity) FROM '
+                       '(SELECT game_id, quantity FROM carts WHERE user_id = %s) c '
+                       'JOIN games g ON g.id = c.game_id', (user_id,))['sum']
+    order_id = db.insert('INSERT INTO orders (user_id, amount) VALUES (%s, %s) RETURNING id',
+                         (user_id, amount), True)['id']
+    db.insert('INSERT INTO orders_games (SELECT %s, c.game_id, quantity, price '
+              'FROM (SELECT * FROM carts WHERE user_id = %s) c '
+              'JOIN (SELECT id, price FROM games) g ON c.game_id = g.id)',
+              (order_id, user_id))
+    db.update('UPDATE games g SET in_stock = (in_stock - '
+              '(SELECT quantity FROM carts WHERE user_id = %s AND game_id = g.id)) '
+              'WHERE id IN (SELECT game_id FROM carts WHERE user_id = %s)', (user_id, user_id))
+    db.delete('DELETE FROM carts WHERE user_id = %s', (user_id,))
+    flash(f'Заказ #{order_id} успешно создан', 'success')
+    return redirect(url_for('profile.order', order_id=order_id))

@@ -58,9 +58,14 @@ class Database:
             data = data[0]
         return data
 
-    def insert(self, query, values):
+    def insert(self, query, values, returning=False):
         self.cursor.execute(query, values)
         self.connection.commit()
+        if returning:
+            data = self.cursor.fetchall()
+            if len(data) == 1:
+                data = data[0]
+            return data
 
     delete = insert
     update = insert

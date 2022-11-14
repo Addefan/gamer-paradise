@@ -73,7 +73,10 @@
                 Оплата наличными
             </label>
             <br><br>
-            <button type="button" class="btn btn-dark w-100">Оформить заказ</button>
+            <button type="button" class="btn btn-dark w-100"
+                    onclick="window.location='{{ url_for('.make_order') }}'">
+                Оформить заказ
+            </button>
         </div>
     </div>
 {% endblock %}
@@ -142,7 +145,7 @@
                 $(this).text(new_detail_price + ' ₽').fadeIn(500);
             });
             let total_price = $('#total_price');
-            let new_total_price = +(total_price.text().slice(0, -2) - diff) + +new_detail_price  + ' ₽';
+            let new_total_price = (+(total_price.text().slice(0, -2) - diff) + +new_detail_price).toFixed(2)  + ' ₽';
             total_price.fadeOut(500, function () {
                 $(this).text(new_total_price).fadeIn(500);
             });
