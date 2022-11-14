@@ -8,7 +8,29 @@
         <div class="row">
             {% block games_header %}
                 <div class="col-9">
-                    <p class="ms-2 mb-3 h5">Сортировка: {# TODO: сортировка по дате, названию, цене #}</p>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle ms-2 mb-3"
+                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Сортировка
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" id="alphabet"
+                                   href="{{ url_for('.index', order='alphabet') }}">По алфавиту</a>
+                            </li>
+                            <li><a class="dropdown-item" id="cheap"
+                                   href="{{ url_for('.index', order='cheap') }}">Сначала дешевые</a>
+                            </li>
+                            <li><a class="dropdown-item" id="expensive"
+                                   href="{{ url_for('.index', order='expensive') }}">Сначала дорогие</a>
+                            </li>
+                            <li><a class="dropdown-item" id="new"
+                                   href="{{ url_for('.index', order='new') }}">Сначала новые</a>
+                            </li>
+                            <li><a class="dropdown-item" id="old"
+                                   href="{{ url_for('.index', order='old') }}">Сначала старые</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="col-3">
                     <p class="mb-3 h5">Фильтры</p>
@@ -25,4 +47,14 @@
         </div>
     </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+        $('#' + params.order).addClass('active');
+    </script>
 {% endblock %}

@@ -16,13 +16,18 @@ class GamesView(MethodView):
         db = get_db()
         user_id = current_user.user['id'] if not current_user.is_anonymous else 0
         platforms = request.args.getlist('platform')
+        order = request.args.get('order')
         query = ('SELECT *, EXISTS (SELECT true FROM favorites '
                  'WHERE game_id = id AND user_id = %s) AS is_favorite '
-                 'FROM games WHERE is_deleted = false')
+                 'FROM games WHERE is_deleted = false AND in_stock > 0')
         vals = [user_id]
         if platforms:
             query += ' AND platform = ANY(%s)'
             vals += [platforms]
+        if order:
+            sort_map = {'alphabet': 'title', 'cheap': 'price', 'expensive': 'price DESC',
+                        'new': 'release_date DESC', 'old': 'release_date'}
+            query += f' ORDER BY {sort_map[order]}'
         games_list = db.select(query, vals)
         return render_template('games/games.html', games=games_list)
 
