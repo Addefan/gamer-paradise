@@ -39,6 +39,7 @@ def register_blueprints(app):
 
 def register_filters(app):
     app.add_template_filter(filters.date, 'date')
+    app.add_template_filter(filters.cart_amount, 'cart_amount')
 
 
 if __name__ == "__main__":

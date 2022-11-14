@@ -14,3 +14,7 @@ def date(dt, fmt, loc='Russian'):
     for month in months:
         result = result.replace(month, months[month])
     return result
+
+
+def cart_amount(games):
+    return sum(game['price'] * game['quantity'] for game in games)
