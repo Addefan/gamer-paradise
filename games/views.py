@@ -112,3 +112,15 @@ def cart():
                            '(SELECT game_id, quantity FROM carts c WHERE user_id = %s) c '
                            'JOIN games g ON g.id = c.game_id', (user_id,))
     return render_template('games/cart.html', games=games_list)
+
+
+@games.route('/change_count_cart')
+@login_required
+def change_count_cart():
+    db = get_db()
+    user_id = current_user.user['id']
+    game_id = request.args.get('game_id')
+    count = request.args.get('count')
+    db.update('UPDATE carts SET quantity = %s WHERE user_id = %s AND game_id = %s',
+              (count, user_id, game_id))
+    return {}

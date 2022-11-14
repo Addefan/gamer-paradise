@@ -32,8 +32,8 @@
                                         top-0 end-0 mt-3 me-3" id="game_close_{{ game.id }}">
                                             {{ icon('fa6-solid:trash-can') }}
                                         </button>
-                                        <p class="card-text bold position-absolute bottom-0 mb-4">
-                                            {{ game.price }} ₽
+                                        <p class="card-text bold position-absolute bottom-0 mb-4"
+                                        id="game_price_{{ game.id }}">{{ game.price }} ₽
                                             <span class="text-muted">(за 1 шт.)</span>
                                         </p>
                                     </div>
@@ -45,13 +45,15 @@
                 <h4>Детальная сумма заказа</h4>
                 <hr>
                 {% for game in games %}
-                    <div>
+                    <div id="detail_price_{{ game.id }}">
                         <span class="card-text">{{ game.title }}</span>
                         <p class="card-text float-end">{{ game.price * game.quantity }} ₽</p>
                     </div>
                 {% endfor %}
                 <span class="card-text h5">Итого</span>
-                <p class="card-text float-end h5">{{ games|cart_amount }} ₽</p>
+                <p class="card-text float-end h5" id="total_detail_price">
+                    {{ games|cart_amount }} ₽
+                </p>
             </div>
         </div>
     </div>
@@ -64,7 +66,7 @@
             <hr>
             <div>
                 <span class="card-text">К оплате</span>
-                <p class="card-text float-end">{{ games|cart_amount }} ₽</p>
+                <p class="card-text float-end" id="total_price">{{ games|cart_amount }} ₽</p>
             </div><br>
             <label>
                 <input class="form-check-input" disabled checked type="checkbox">
@@ -74,4 +76,88 @@
             <button type="button" class="btn btn-dark w-100">Оформить заказ</button>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        $(".game-count").click(function (e) {
+            e.stopImmediatePropagation();
+        });
+
+        $(".close").on('click', function (e) {
+            e.stopPropagation();
+            $(this).prop('disabled', true);
+            setTimeout(function () {
+                $(this).prop('disabled', false);
+            }.bind(this), 1000);
+
+            let game_id = this.id.substring(11);
+            let data = {'checked': true, 'game_id': game_id};
+
+            let detail_price = $('#detail_price_' + game_id);
+            let diff = detail_price.children('p').text().slice(0, -2);
+            let total_price = $('#total_price');
+            let new_total_price = total_price.text().slice(0, -2) - diff + ' ₽';
+            total_price.fadeOut(500, function () {
+                $(this).text(new_total_price).fadeIn(500);
+            });
+            $('#total_detail_price').fadeOut(500, function () {
+                $(this).text(new_total_price).fadeIn(500);
+            });
+            detail_price.css({'opacity': 0, 'transition': '1s'});
+            setTimeout(function () {
+                detail_price.css('display', 'none');
+            }, 1000);
+
+            $('#game' + game_id).css({'opacity': 0, 'transition': '1s'});
+            setTimeout(function () {
+                $('#game' + game_id).css('display', 'none');
+            }, 1000);
+
+            $.ajax({
+                url: "{{ url_for('.change_cart') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            });
+        });
+
+        $('.game-count').on('input', function () {
+            if (!$(this)[0].checkValidity()) {
+                $(this).css('border-color', 'red');
+                return;
+            }
+
+            $(this).css('border-color', '#6c757d');
+
+            let game_id = this.id.substring(11);
+
+            let game_price = $('#game_price_' + game_id).text().slice(0, -98);
+            let new_count = $(this).val();
+            let detail_price = $('#detail_price_' + game_id).children('p');
+            let diff = detail_price.text().slice(0, -2);
+            let new_detail_price = (new_count * game_price).toFixed(2);
+            detail_price.fadeOut(500, function () {
+                $(this).text(new_detail_price + ' ₽').fadeIn(500);
+            });
+            let total_price = $('#total_price');
+            let new_total_price = +(total_price.text().slice(0, -2) - diff) + +new_detail_price  + ' ₽';
+            total_price.fadeOut(500, function () {
+                $(this).text(new_total_price).fadeIn(500);
+            });
+            $('#total_detail_price').fadeOut(500, function () {
+                $(this).text(new_total_price).fadeIn(500);
+            });
+
+            let data = {'count': new_count, 'game_id': game_id};
+
+            $.ajax({
+                url: "{{ url_for('.change_count_cart') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            });
+        });
+    </script>
 {% endblock %}

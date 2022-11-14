@@ -32,8 +32,8 @@
                                 <div class="position-absolute bottom-0 end-0 me-3 mb-3
                                 d-flex align-items-center">
                                     {% if game.in_cart %}
-                                        <button type="button" class="btn btn-dark"
-                                                onclick="window.location=''"> {# TODO: изменить ссылку на корзину #}
+                                        <button type="button" class="btn btn-dark go-cart"
+                                                onclick="window.location='{{ url_for('.cart') }}'">
                                             Посмотреть в корзине
                                         </button>
                                     {% else %}
@@ -62,6 +62,10 @@
             e.stopImmediatePropagation();
         });
 
+        $(".go-cart").click(function (e) {
+            e.stopImmediatePropagation();
+        });
+
         $(".close").on('click', function (e) {
             e.stopPropagation();
             $(this).prop('disabled', true);
@@ -70,20 +74,19 @@
             }.bind(this), 1000);
 
             let game_id = this.id.substring(11);
-            let data = {'checked': true, 'game_id': game_id}
+            let data = {'checked': true, 'game_id': game_id};
 
             $('#game' + game_id).css({'opacity': 0, 'transition': '1s'});
             setTimeout(function () {
                 $('#game' + game_id).css('display', 'none');
             }, 1000);
 
-
             $.ajax({
                 url: "{{ url_for('.change_favorite') }}",
                 method: 'get',
                 dataType: 'html',
                 data: data,
-            })
+            });
         })
 
         $(".to-cart").on('click', function (e) {
@@ -96,20 +99,18 @@
                 input_count.css('border-color', 'red');
                 return;
             }
-            let data = {'checked': false, 'game_id': game_id, 'count': count}
-
-            console.log('game_count_' + game_id);
+            let data = {'checked': false, 'game_id': game_id, 'count': count};
 
             input_count.css('display', 'none');
             $(this).text('Посмотреть в корзине');
-            $(this).attr('onclick', "window.location=''" {# TODO: изменить ссылку на корзину #});
+            $(this).attr('onclick', "window.location='{{ url_for('.cart') }}'");
 
             $.ajax({
                 url: "{{ url_for('.change_cart') }}",
                 method: 'get',
                 dataType: 'html',
                 data: data,
-            })
+            });
         })
     </script>
 {% endblock %}
