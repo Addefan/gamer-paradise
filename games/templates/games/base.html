@@ -4,19 +4,25 @@
 
 {% block content %}
     <div class="card mb-3">
+    <div class="card-body">
         <div class="row">
-            <div class="col-9">
-                <p class="mt-3 ms-2 mb-3 h5">Сортировка: {# TODO: сортировка по дате, названию, цене #}</p>
-            </div>
-            <div class="col-3">
-                <p class="mt-3 mb-3 h5">Фильтры</p>
-            </div>
+            {% block games_header %}
+                <div class="col-9">
+                    <p class="ms-2 mb-3 h5">Сортировка: {# TODO: сортировка по дате, названию, цене #}</p>
+                </div>
+                <div class="col-3">
+                    <p class="mb-3 h5">Фильтры</p>
+                </div>
+            {% endblock %}
         </div>
         <div class="row">
             {% block games_content %}{% endblock %}
             <div class="col-3">
-                {# TODO: фильрация по платформе и по разработчику #}
+                {% block games_side %}
+                    {# TODO: фильрация по платформе и по разработчику #}
+                {% endblock %}
             </div>
         </div>
+    </div>
     </div>
 {% endblock %}

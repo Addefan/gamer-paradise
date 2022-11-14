@@ -1,6 +1,12 @@
 {% extends 'games/base.html' %}
 {% from 'navbar.html' import icon with context %}
 
+{% block games_header %}
+    <h2 class="card-title">Товары</h2>
+    <hr>
+    {{ super() }}
+{% endblock %}
+
 {% block games_content %}
     <div class="col-9 d-flex flex-wrap row-cols-sm-2 row-cols-xl-4">
         {% for game in games %}
