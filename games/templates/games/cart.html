@@ -1,0 +1,77 @@
+{% extends 'games/base.html' %}
+{% from 'navbar.html' import icon with context %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block games_header %}
+    <h2 class="card-title">Корзина</h2>
+    <hr>
+{% endblock %}
+
+{% block games_content %}
+    <div class="col-9">
+        <div class="card">
+            <div class="card-body">
+                <h4>Товары</h4>
+                <hr>
+                <div class="card-body ps-2 pt-0">
+                    {% for game in games %}
+                        <div class="card mb-3 pointer" id=game{{ game.id }} onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
+                            <div class="row g-0">
+                                <div class="col-3 align-self-center">
+                                    <img src="/{{ game.photo }}" class="rounded fav-game"
+                                    alt="{{ game.title }}">
+                                </div>
+                                <div class="col-9">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ game.title }}</p>
+                                        <input class="game-count text-center"
+                                               type="number" min="1" value="{{ game.quantity }}"
+                                               max="{{ game.in_stock }}" id="game_count_{{ game.id }}">
+                                        <button type="button" class="close float-end position-absolute
+                                        top-0 end-0 mt-3 me-3" id="game_close_{{ game.id }}">
+                                            {{ icon('fa6-solid:trash-can') }}
+                                        </button>
+                                        <p class="card-text bold position-absolute bottom-0 mb-4">
+                                            {{ game.price }} ₽
+                                            <span class="text-muted">(за 1 шт.)</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <h4>Детальная сумма заказа</h4>
+                <hr>
+                {% for game in games %}
+                    <div>
+                        <span class="card-text">{{ game.title }}</span>
+                        <p class="card-text float-end">{{ game.price * game.quantity }} ₽</p>
+                    </div>
+                {% endfor %}
+                <span class="card-text h5">Итого</span>
+                <p class="card-text float-end h5">{{ games|cart_amount }} ₽</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block games_side %}
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">О заказе</h4>
+            <hr>
+            <div>
+                <span class="card-text">К оплате</span>
+                <p class="card-text float-end">{{ games|cart_amount }} ₽</p>
+            </div><br>
+            <label>
+                <input class="form-check-input" disabled checked type="checkbox">
+                Оплата наличными
+            </label>
+            <br><br>
+            <button type="button" class="btn btn-dark w-100">Оформить заказ</button>
+        </div>
+    </div>
+{% endblock %}

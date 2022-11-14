@@ -23,8 +23,8 @@ class GamesView(MethodView):
         if platforms:
             query += ' AND platform = ANY(%s)'
             vals += [platforms]
-        games = db.select(query, vals)
-        return render_template('games/games.html', games=games)
+        games_list = db.select(query, vals)
+        return render_template('games/games.html', games=games_list)
 
 
 class CreateGameView(MethodView):
@@ -64,6 +64,7 @@ class CreateGameView(MethodView):
 
 
 @games.route('/change_favorite')
+@login_required
 def change_favorite():
     db = get_db()
     user_id = current_user.user['id']
@@ -76,6 +77,7 @@ def change_favorite():
 
 
 @games.route('/favorites')
+@login_required
 def favorites():
     db = get_db()
     user_id = current_user.user['id']
@@ -87,6 +89,7 @@ def favorites():
 
 
 @games.route('/change_cart')
+@login_required
 def change_cart():
     db = get_db()
     user_id = current_user.user['id']
@@ -98,3 +101,14 @@ def change_cart():
         db.insert('INSERT INTO carts (user_id, game_id, quantity) VALUES (%s, %s, %s)',
                   (user_id, game_id, count))
     return {}
+
+
+@games.route('/cart')
+@login_required
+def cart():
+    db = get_db()
+    user_id = current_user.user['id']
+    games_list = db.select('SELECT * FROM '
+                           '(SELECT game_id, quantity FROM carts c WHERE user_id = %s) c '
+                           'JOIN games g ON g.id = c.game_id', (user_id,))
+    return render_template('games/cart.html', games=games_list)

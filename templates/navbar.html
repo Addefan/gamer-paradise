@@ -25,7 +25,7 @@
             <div class="navbar-nav d-inline-flex">
                 {{ nav_link('Товары', 'clarity:shopping-bag-solid', href=url_for('games.index')) }}
                 {{ nav_link('Избранное', 'mdi:cards-heart', href=url_for('games.favorites')) }}
-                {{ nav_link('Корзина', 'clarity:shopping-cart-solid') }} {# TODO: исправить ссылку #}
+                {{ nav_link('Корзина', 'clarity:shopping-cart-solid', href=url_for('games.cart')) }}
                 {% if current_user.is_authenticated and current_user.user.role == 'admin' %}
                     {{ nav_link('Добавить товар', 'material-symbols:add-business-rounded',
                     'text-nowrap', url_for('games.add')) }}
