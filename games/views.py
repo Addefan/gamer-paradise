@@ -11,33 +11,57 @@ from games import games
 from games.forms import CreateGameForm
 
 
+def get_platforms_and_developers(db):
+    platforms_list = db.select('SELECT DISTINCT platform FROM games '
+                               'WHERE is_deleted = false AND in_stock > 0')
+    if not isinstance(platforms_list, list):
+        platforms_list = [platforms_list]
+    developers_list = db.select('SELECT DISTINCT developer FROM games '
+                                'WHERE is_deleted = false AND in_stock > 0')
+    if not isinstance(developers_list, list):
+        developers_list = [developers_list]
+    return {'platforms': platforms_list, 'developers': developers_list}
+
+
+def get_searched_sorted_filtered_games(db, user_id, initial_query, initial_vals=None):
+    platforms = request.args.getlist('platform')
+    developers = request.args.getlist('developer')
+    order = request.args.get('order')
+    search = request.args.get('search', '').lower()
+    query = initial_query
+    if initial_vals is None:
+        initial_vals = []
+    if platforms:
+        query += ' AND platform = ANY(%s)'
+        initial_vals.append(platforms)
+    if developers:
+        query += ' AND developer = ANY(%s)'
+        initial_vals.append(developers)
+    if search:
+        query += (" AND (lower(title) LIKE '%%' || %s || '%%' OR "
+                  "lower(description) LIKE '%%' || %s || '%%')")
+        initial_vals.append(search)
+        initial_vals.append(search)
+    if order:
+        sort_map = {'alphabet': 'title', 'cheap': 'price', 'expensive': 'price DESC',
+                    'new': 'release_date DESC', 'old': 'release_date'}
+        query += f' ORDER BY {sort_map.get(order, "id")}'
+    games_list = db.select(query, initial_vals)
+    if not isinstance(games_list, list):
+        games_list = [games_list]
+    return games_list
+
+
 class GamesView(MethodView):
     def get(self):
         db = get_db()
         user_id = current_user.user['id'] if not current_user.is_anonymous else 0
-        platforms = request.args.getlist('platform')
-        order = request.args.get('order')
-        search = request.args.get('search', '').lower()
         query = ('SELECT *, EXISTS (SELECT true FROM favorites '
                  'WHERE game_id = id AND user_id = %s) AS is_favorite '
                  'FROM games WHERE is_deleted = false AND in_stock > 0')
         vals = [user_id]
-        if platforms:
-            query += ' AND platform = ANY(%s)'
-            vals.append(platforms)
-        if search:
-            query += (" AND (lower(title) LIKE '%%' || %s || '%%' OR "
-                      "lower(description) LIKE '%%' || %s || '%%')")
-            vals.append(search)
-            vals.append(search)
-        if order:
-            sort_map = {'alphabet': 'title', 'cheap': 'price', 'expensive': 'price DESC',
-                        'new': 'release_date DESC', 'old': 'release_date'}
-            query += f' ORDER BY {sort_map.get(order, "id")}'
-        games_list = db.select(query, vals)
-        if not isinstance(games_list, list):
-            games_list = [games_list]
-        return render_template('games/games.html', games=games_list)
+        return render_template('games/games.html', **get_platforms_and_developers(db),
+                               games=get_searched_sorted_filtered_games(db, user_id, query, vals))
 
 
 class CreateGameView(MethodView):
@@ -94,13 +118,14 @@ def change_favorite():
 def favorites():
     db = get_db()
     user_id = current_user.user['id']
-    games_list = db.select('SELECT *, EXISTS (SELECT true FROM carts '
-                           'WHERE game_id = id AND user_id = %s) AS in_cart '
-                           'FROM (SELECT game_id FROM favorites f WHERE user_id = %s) f '
-                           'JOIN games g ON g.id = f.game_id', (user_id, user_id))
-    if not isinstance(games_list, list):
-        games_list = [games_list]
-    return render_template('games/favorites.html', games=games_list)
+    query = ('SELECT *, EXISTS (SELECT true FROM carts '
+             'WHERE game_id = id AND user_id = %s) AS in_cart '
+             'FROM (SELECT game_id FROM favorites f WHERE user_id = %s) f '
+             'JOIN games g ON g.id = f.game_id '
+             'WHERE is_deleted = false AND in_stock > 0')
+    vals = [user_id, user_id]
+    return render_template('games/favorites.html', **get_platforms_and_developers(db),
+                           games=get_searched_sorted_filtered_games(db, user_id, query, vals))
 
 
 @games.route('/change_cart')
@@ -125,7 +150,8 @@ def cart():
     user_id = current_user.user['id']
     games_list = db.select('SELECT * FROM '
                            '(SELECT game_id, quantity FROM carts c WHERE user_id = %s) c '
-                           'JOIN games g ON g.id = c.game_id', (user_id,))
+                           'JOIN (SELECT * FROM games WHERE is_deleted = false AND in_stock > 0) g '
+                           'ON g.id = c.game_id ', (user_id,))
     if not isinstance(games_list, list):
         games_list = [games_list]
     return render_template('games/cart.html', games=games_list)
@@ -150,7 +176,8 @@ def make_order():
     user_id = current_user.user['id']
     amount = db.select('SELECT sum(price * quantity) FROM '
                        '(SELECT game_id, quantity FROM carts WHERE user_id = %s) c '
-                       'JOIN games g ON g.id = c.game_id', (user_id,))['sum']
+                       'JOIN (SELECT * FROM games WHERE is_deleted = false AND in_stock > 0) g '
+                       'ON g.id = c.game_id', (user_id,))['sum']
     order_id = db.insert('INSERT INTO orders (user_id, amount) VALUES (%s, %s) RETURNING id',
                          (user_id, amount), True)['id']
     db.insert('INSERT INTO orders_games (SELECT %s, c.game_id, quantity, price '
@@ -159,7 +186,8 @@ def make_order():
               (order_id, user_id))
     db.update('UPDATE games g SET in_stock = (in_stock - '
               '(SELECT quantity FROM carts WHERE user_id = %s AND game_id = g.id)) '
-              'WHERE id IN (SELECT game_id FROM carts WHERE user_id = %s)', (user_id, user_id))
+              'WHERE id IN (SELECT game_id FROM carts WHERE user_id = %s) AND '
+              'is_deleted = false AND in_stock > 0', (user_id, user_id))
     db.delete('DELETE FROM carts WHERE user_id = %s', (user_id,))
     flash(f'Заказ #{order_id} успешно создан', 'success')
     return redirect(url_for('profile.order', order_id=order_id))

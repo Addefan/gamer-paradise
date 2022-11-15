@@ -37,6 +37,12 @@
                        type="search" placeholder="Поиск товаров" aria-label="Search"
                        value="{{ request.args.get('search', '') }}">
                 <input type="hidden" name="order" value="{{ request.args.get('order') }}">
+                {% for platform in request.args.getlist('platform') %}
+                    <input type="hidden" name="platform" value="{{ platform }}">
+                {% endfor %}
+                {% for developer in request.args.getlist('developer') %}
+                    <input type="hidden" name="developer" value="{{ developer }}">
+                {% endfor %}
                 <button class="btn btn-outline-secondary icon me-3">  {# TODO: исправить нажатие #}
                     {{ icon('fa-solid:search') }}
                 </button>
