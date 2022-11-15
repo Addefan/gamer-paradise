@@ -18,3 +18,7 @@ def date(dt, fmt, loc='Russian'):
 
 def cart_amount(games):
     return sum(game['price'] * game['quantity'] for game in games)
+
+
+def difference(first, second):
+    return list(set(first) - set(second))
