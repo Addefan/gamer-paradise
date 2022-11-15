@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% macro sort_elem(order, title) %}
+    <li><a class="dropdown-item" id="{{ order }}"
+           href="{{ url_for('.index', order=order, search=request.args.get('search')) }}">
+        {{ title }}
+    </a></li>
+{% endmacro %}
+
+
 {% block title %}Товары{% endblock %}
 
 {% block content %}
@@ -14,21 +22,11 @@
                         Сортировка
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" id="alphabet"
-                                   href="{{ url_for('.index', order='alphabet') }}">По алфавиту</a>
-                            </li>
-                            <li><a class="dropdown-item" id="cheap"
-                                   href="{{ url_for('.index', order='cheap') }}">Сначала дешевые</a>
-                            </li>
-                            <li><a class="dropdown-item" id="expensive"
-                                   href="{{ url_for('.index', order='expensive') }}">Сначала дорогие</a>
-                            </li>
-                            <li><a class="dropdown-item" id="new"
-                                   href="{{ url_for('.index', order='new') }}">Сначала новые</a>
-                            </li>
-                            <li><a class="dropdown-item" id="old"
-                                   href="{{ url_for('.index', order='old') }}">Сначала старые</a>
-                            </li>
+                            {{ sort_elem('alphabet', 'По алфавиту') }}
+                            {{ sort_elem('cheap', 'Сначала дешевые') }}
+                            {{ sort_elem('expensive', 'Сначала дорогие') }}
+                            {{ sort_elem('new', 'Сначала новые') }}
+                            {{ sort_elem('old', 'Сначала старые') }}
                         </ul>
                     </div>
                 </div>

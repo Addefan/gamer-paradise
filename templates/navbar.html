@@ -31,9 +31,12 @@
                     'text-nowrap', url_for('games.add')) }}
                 {% endif %}
             </div>
-            <form class="d-flex ms-auto my-2" role="search">
-                <input class="form-control me-2 form-control-dark text-white w-auto"
-                       type="search" placeholder="Поиск товаров" aria-label="Search">
+            <form action="{{ url_for('games.index') }}"
+                  class="d-flex ms-auto my-2" role="search">
+                <input class="form-control me-2 form-control-dark text-white w-auto" name="search"
+                       type="search" placeholder="Поиск товаров" aria-label="Search"
+                       value="{{ request.args.get('search', '') }}">
+                <input type="hidden" name="order" value="{{ request.args.get('order') }}">
                 <button class="btn btn-outline-secondary icon me-3">  {# TODO: исправить нажатие #}
                     {{ icon('fa-solid:search') }}
                 </button>

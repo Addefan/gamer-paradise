@@ -17,18 +17,26 @@ class GamesView(MethodView):
         user_id = current_user.user['id'] if not current_user.is_anonymous else 0
         platforms = request.args.getlist('platform')
         order = request.args.get('order')
+        search = request.args.get('search', '').lower()
         query = ('SELECT *, EXISTS (SELECT true FROM favorites '
                  'WHERE game_id = id AND user_id = %s) AS is_favorite '
                  'FROM games WHERE is_deleted = false AND in_stock > 0')
         vals = [user_id]
         if platforms:
             query += ' AND platform = ANY(%s)'
-            vals += [platforms]
+            vals.append(platforms)
+        if search:
+            query += (" AND (lower(title) LIKE '%%' || %s || '%%' OR "
+                      "lower(description) LIKE '%%' || %s || '%%')")
+            vals.append(search)
+            vals.append(search)
         if order:
             sort_map = {'alphabet': 'title', 'cheap': 'price', 'expensive': 'price DESC',
                         'new': 'release_date DESC', 'old': 'release_date'}
-            query += f' ORDER BY {sort_map[order]}'
+            query += f' ORDER BY {sort_map.get(order, "id")}'
         games_list = db.select(query, vals)
+        if not isinstance(games_list, list):
+            games_list = [games_list]
         return render_template('games/games.html', games=games_list)
 
 
