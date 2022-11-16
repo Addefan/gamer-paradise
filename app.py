@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from flask import Flask, render_template
 
 import database as db
@@ -17,6 +19,7 @@ def create_app(config=Config):
     register_extensions(app)
     register_blueprints(app)
     register_filters(app)
+    register_errorhandlers(app)
 
     @app.route('/')
     def index():
@@ -41,6 +44,18 @@ def register_filters(app):
     app.add_template_filter(filters.date, 'date')
     app.add_template_filter(filters.cart_amount, 'cart_amount')
     app.add_template_filter(filters.difference, 'difference')
+
+
+def register_errorhandlers(app):
+    def render_error(e):
+        print(e)
+        return render_template('%s.html' % e.code), e.code
+
+    for e in [
+        HTTPStatus.NOT_FOUND,
+        HTTPStatus.INTERNAL_SERVER_ERROR,
+    ]:
+        app.register_error_handler(e, render_error)
 
 
 if __name__ == "__main__":
