@@ -134,7 +134,7 @@ hr {
     transition: 1s;
 }
 
-.fav-button, .close {
+.fav-button, .close, .edit-game, .del-game {
     all: unset;
 }
 
@@ -214,4 +214,8 @@ hr {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.edit-game, .del-game {
+    font-size: 1.5rem;
 }

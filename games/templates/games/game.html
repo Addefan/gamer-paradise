@@ -1,5 +1,8 @@
 {% extends 'games/base.html' %}
 
+{% from 'navbar.html' import icon with context %}
+{% from 'macros.html' import modal %}
+
 {% macro info_item(title, value) %}
     <div class="row d-flex align-items-center">
         <div class="col-5">
@@ -15,24 +18,35 @@
 {% block title %}{{ game.title }}{% endblock %}
 
 {% block games_header %}
+    {% if current_user.user.role == 'admin' %}
+        <div class="position-absolute top-0 end-0 me-3 mt-3 w-auto">
+            <button type="button" class="edit-game mx-1">
+                {{ icon('material-symbols:edit') }}
+            </button>
+            <button type="button" class="del-game mx-1" data-bs-toggle="modal"
+                    data-bs-target="#delete">
+                {{ icon('fa6-solid:trash-can') }}
+            </button>
+            {{ modal('delete', 'Удаление товара: "' + game.title + '"', 'Вы действительно хотите
+            удалить "' + game.title + '"?', 'btn-danger', 'Удалить товар',
+            url_for('.delete_game', game_id=game.id)) }}
+        </div>
+    {% endif %}
     <h2 class="card-title">{{ game.title }}
         <span class="badge rounded-pill bg-dark h4">{{ game.price }} ₽</span>
     </h2>
-    <svg style="display:none;">
-        <defs>
-            <symbol id="fivestars">
-            {% for i in range(5) %}
-                <path id="star{{ i }}" transform="translate({{ 24 * i }})" d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd"></path>
-            {% endfor %}
-            </symbol>
-        </defs>
-    </svg>
-    <div class="d-flex">
-    <div class="rating mb-2 me-2">
-        <progress class="rating-bg" value="{{ game.rating }}" max="5"></progress>
-        <svg><use xlink:href="#fivestars"/></svg>
+    <div class="d-flex mb-1">
+        <div class="rating mb-2 me-2">
+            <progress class="rating-bg {% if not game.is_reviewed %}review{% endif %}"
+                      value="{{ game.rating }}" max="5"></progress>
+            <svg>
+                {% for i in range(5) %}
+                    <path id="star{{ i }}" class="star" transform="translate({{ 24 * i }})" d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd"></path>
+                {% endfor %}
+            </svg>
+        </div>
+        <span class="bold rating-text">{{ game.rating|default('0.00', True) }}</span>
     </div>
-    <span class="bold">{{ game.rating|default('0.00', True) }}</span></div>
     <hr>
 {% endblock %}
 
@@ -131,5 +145,36 @@
                 data: data,
             });
         });
+
+        let rating = $('.rating-bg');
+        let initial_val = rating.attr('value');
+        if (rating.hasClass('review')) {
+            let stars = $('.star');
+            $.each(stars, function (i, item) {
+                $(item).hover(function () {
+                    rating.attr('value', i + 1);
+                }, function () {
+                    rating.attr('value', initial_val);
+                });
+            });
+
+            stars.on('click', function () {
+                let star_id = this.id.substring(4);
+                let data = {'game_id': {{ game.id }}, 'score': star_id};
+                $.ajax({
+                    url: "{{ url_for('.make_review') }}",
+                    method: 'get',
+                    dataType: 'html',
+                    data: data,
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        console.log(data['rating']);
+                        $('.rating-text').text(data['rating']);
+                        stars.unbind('mouseenter mouseleave');
+                        rating.attr('value', data['rating'])
+                    }
+                });
+            })
+        }
     </script>
 {% endblock %}

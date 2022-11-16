@@ -90,12 +90,12 @@ class CreateGameView(MethodView):
                 photo_filename = path.join('static', 'images', secure_filename(photo.filename))
                 photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
             else:
-                photo_filename = '/static/images/default_game.png'
+                photo_filename = 'static/images/default_game.png'
             game_id = db.insert('INSERT INTO games (title, description, price, photo, platform, '
                                 'developer, release_date, in_stock, is_deleted) VALUES '
                                 '(%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
                                 (title, description, price, photo_filename, platform, developer,
-                                 release_date, in_stock, is_deleted))['id']
+                                 release_date, in_stock, is_deleted), True)['id']
             return redirect(url_for('.game', game_id=game_id))
         return render_template('games/create_game.html', form=form)
 
@@ -197,8 +197,8 @@ def make_order():
 def game(game_id):
     db = get_db()
     user_id = current_user.user['id'] if not current_user.is_anonymous else 0
-    cur_game = db.select('SELECT *, (SELECT avg(score) FROM reviews WHERE game_id = %s) AS rating, '
-                         'EXISTS (SELECT true FROM reviews '
+    cur_game = db.select('SELECT *, (SELECT round(avg(score), 2) FROM reviews WHERE game_id = %s) '
+                         'AS rating, EXISTS (SELECT true FROM reviews '
                          'WHERE user_id = %s AND game_id = %s) AS is_reviewed, '
                          'EXISTS (SELECT true FROM carts '
                          'WHERE game_id = id AND user_id = %s) AS in_cart,'
@@ -207,3 +207,28 @@ def game(game_id):
                          'FROM games WHERE id = %s',
                          (game_id, user_id, game_id, user_id, user_id, game_id))
     return render_template('games/game.html', game=cur_game)
+
+
+@games.route('/make_review')
+@login_required
+def make_review():
+    db = get_db()
+    user_id = current_user.user['id']
+    game_id = request.args.get('game_id')
+    score = request.args.get('score')
+    db.insert('INSERT INTO reviews VALUES (%s, %s, %s)', (user_id, game_id, score))
+    rating = db.select('SELECT round(avg(score), 2) FROM reviews WHERE game_id = %s',
+                       (game_id,))['round']
+    return {'rating': rating}
+
+
+@games.route('/<int:game_id>/delete')
+@login_required
+def delete_game(game_id):
+    if not current_user.user['role'] == Role.admin:
+        return redirect(url_for('.index'))
+    db = get_db()
+    db.delete('UPDATE games SET is_deleted = true WHERE id = %s', (game_id,))
+    flash('Товар успешно удалён', 'success')
+    return redirect(url_for('.index'))
+

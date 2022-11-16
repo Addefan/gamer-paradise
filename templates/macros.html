@@ -1,0 +1,26 @@
+{% macro modal(id, title, body, btn_classes='btn-primary', btn_text='Ок', onclick_path='') %}
+    <div class="modal fade" id="{{ id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">{{ title }}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ body|safe }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Отмена
+                </button>
+                <button type="button" class="btn {{ btn_classes }}"
+                        {% if onclick_path %}
+                        onclick="window.location='{{ onclick_path }}'"
+                        {% endif %}
+                >{{ btn_text }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
