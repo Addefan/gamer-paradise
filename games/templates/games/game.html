@@ -5,7 +5,7 @@
 {% block title %}{{ game.title }}{% endblock %}
 
 {% block games_header %}
-    {% if current_user.user.role == 'admin' %}
+    {% if current_user.is_authenticated and current_user.user.role == 'admin' %}
         <div class="position-absolute top-0 end-0 me-3 mt-3 w-auto">
             <button type="button" class="edit-game mx-1"
                     onclick="document.location='{{ url_for('.edit', game_id=game.id) }}'">
@@ -25,7 +25,8 @@
     </h2>
     <div class="d-flex mb-1">
         <div class="rating mb-2 me-2">
-            <progress class="rating-bg {% if not game.is_reviewed %}review{% endif %}"
+            <progress class="rating-bg
+{% if current_user.is_authenticated and not game.is_reviewed %}review{% endif %}"
                       value="{{ game.rating }}" max="5"></progress>
             <svg>
                 {% for i in range(5) %}
@@ -57,29 +58,31 @@
 
 {% block games_side %}
     <div class="card-body">
-        <div class="d-flex align-items-center mb-2">
-            {% if game.in_cart %}
-                <button type="button" class="btn btn-dark go-cart w-100"
-                        onclick="window.location='{{ url_for('.cart') }}'">
-                    Посмотреть в корзине
-                </button>
+        {% if current_user.is_authenticated %}
+            <div class="d-flex align-items-center mb-2">
+                {% if game.in_cart %}
+                    <button type="button" class="btn btn-dark go-cart w-100"
+                            onclick="window.location='{{ url_for('.cart') }}'">
+                        Посмотреть в корзине
+                    </button>
+                {% else %}
+                    <input class="game-count me-2 text-center" type="number"
+                           min="1" value="1" max="{{ game.in_stock }}"
+                           id="game_count_{{ game.id }}">
+                    <button type="button" class="btn btn-dark to-cart w-100"
+                    id="to_cart_{{ game.id }}">
+                        В корзину
+                    </button>
+                {% endif %}
+            </div>
+            <button type="button" class="btn btn-dark w-100 mb-3 to-fav
+            {% if game.in_favorites %}
+                 checked">Удалить из избранного
             {% else %}
-                <input class="game-count me-2 text-center" type="number"
-                       min="1" value="1" max="{{ game.in_stock }}"
-                       id="game_count_{{ game.id }}">
-                <button type="button" class="btn btn-dark to-cart w-100"
-                id="to_cart_{{ game.id }}">
-                    В корзину
-                </button>
+                ">В избранное
             {% endif %}
-        </div>
-        <button type="button" class="btn btn-dark w-100 mb-3 to-fav
-        {% if game.in_favorites %}
-             checked">Удалить из избранного
-        {% else %}
-            ">В избранное
+            </button>
         {% endif %}
-        </button>
         {{ info_item('Платформа', game.platform) }}
         {{ info_item('Разработчик', game.developer) }}
         {{ info_item('Дата релиза', game.release_date|date('d.m.Y')) }}
