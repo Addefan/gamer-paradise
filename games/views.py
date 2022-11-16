@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from auth.enums import Role
 from database import get_db
 from games import games
-from games.forms import CreateGameForm
+from games.forms import GameForm
 
 
 def get_platforms_and_developers(db):
@@ -70,11 +70,11 @@ class CreateGameView(MethodView):
     def get(self):
         if current_user.user['role'] != Role.admin:
             return redirect(url_for('.index'))
-        form = CreateGameForm()
-        return render_template('games/create_game.html', form=form)
+        form = GameForm()
+        return render_template('games/game_form.html', form=form, action='Добавление товара')
 
     def post(self):
-        form = CreateGameForm()
+        form = GameForm()
         if form.validate_on_submit():
             title = form.title.data
             description = form.description.data
@@ -97,7 +97,7 @@ class CreateGameView(MethodView):
                                 (title, description, price, photo_filename, platform, developer,
                                  release_date, in_stock, is_deleted), True)['id']
             return redirect(url_for('.game', game_id=game_id))
-        return render_template('games/create_game.html', form=form)
+        return render_template('games/game_form.html', form=form, action='Добавление товара')
 
 
 @games.route('/change_favorite')
@@ -231,4 +231,52 @@ def delete_game(game_id):
     db.delete('UPDATE games SET is_deleted = true WHERE id = %s', (game_id,))
     flash('Товар успешно удалён', 'success')
     return redirect(url_for('.index'))
+
+
+class EditGameView(MethodView):
+    decorators = [login_required]
+
+    def get(self, game_id):
+        if not current_user.user['role'] == Role.admin:
+            return redirect(url_for('.index'))
+        db = get_db()
+        cur_game = db.select('SELECT * FROM games WHERE id = %s', (game_id,))
+        form = GameForm()
+        form.title.data = cur_game['title']
+        form.description.data = cur_game['description']
+        form.price.data = float(cur_game['price'])
+        form.platform.data = cur_game['platform']
+        form.developer.data = cur_game['developer']
+        form.release_date.data = cur_game['release_date']
+        form.in_stock.data = int(cur_game['in_stock'])
+        form.is_deleted.data = cur_game['is_deleted'] == 'true'
+        form.submit.label.text = 'Обновить товар'
+        return render_template('games/game_form.html', form=form, action='Изменение товара')
+
+    def post(self, game_id):
+        form = GameForm()
+        if form.validate_on_submit():
+            title = form.title.data
+            description = form.description.data
+            price = form.price.data
+            photo = form.photo.data
+            platform = form.platform.data
+            developer = form.developer.data
+            release_date = form.release_date.data
+            in_stock = form.in_stock.data
+            is_deleted = form.is_deleted.data
+            db = get_db()
+            if photo:
+                photo_filename = path.join('static', 'images', secure_filename(photo.filename))
+                photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
+            else:
+                photo_filename = 'static/images/default_game.png'
+            game_id = db.update('UPDATE games SET (title, description, price, photo, platform, '
+                                'developer, release_date, in_stock, is_deleted) = '
+                                '(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                                'WHERE id = %s RETURNING id',
+                                (title, description, price, photo_filename, platform, developer,
+                                 release_date, in_stock, is_deleted, game_id), True)['id']
+            return redirect(url_for('.game', game_id=game_id))
+        return render_template('games/game_form.html', form=form, action='Обновление товара')
 

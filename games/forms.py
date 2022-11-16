@@ -5,7 +5,7 @@ from wtforms import (StringField, TextAreaField, DecimalField, DateField, Intege
 from wtforms.validators import InputRequired, Length, NumberRange, Regexp
 
 
-class CreateGameForm(FlaskForm):
+class GameForm(FlaskForm):
     title = StringField('Название игры', [InputRequired('Это поле обязательно'),
                                           Length(max=255, message='Название игры должно быть не '
                                                                   'длиннее 255 символов')])
