@@ -5,7 +5,7 @@
 {% block title %}{{ game.title }}{% endblock %}
 
 {% block games_header %}
-    {% if current_user.is_authenticated and current_user.user.role == 'admin' %}
+    {% if current_user.is_authenticated and current_user.user.role == 'admin' and not game.is_deleted %}
         <div class="position-absolute top-0 end-0 me-3 mt-3 w-auto">
             <button type="button" class="edit-game mx-1"
                     onclick="document.location='{{ url_for('.edit', game_id=game.id) }}'">
@@ -58,7 +58,7 @@
 
 {% block games_side %}
     <div class="card-body">
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and not game.is_deleted %}
             <div class="d-flex align-items-center mb-2">
                 {% if game.in_cart %}
                     <button type="button" class="btn btn-dark go-cart w-100"
