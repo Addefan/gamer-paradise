@@ -43,7 +43,7 @@
                 {% for developer in request.args.getlist('developer') %}
                     <input type="hidden" name="developer" value="{{ developer }}">
                 {% endfor %}
-                <button class="btn btn-outline-secondary icon me-3">  {# TODO: исправить нажатие #}
+                <button class="btn btn-outline-secondary icon me-3">
                     {{ icon('fa-solid:search') }}
                 </button>
             </form>

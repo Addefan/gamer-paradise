@@ -73,7 +73,7 @@ class OrderView(MethodView):
         order = db.select('SELECT * FROM orders WHERE id = %s', (order_id,))
         if not order['user_id'] == current_user.user['id']:
             return redirect(url_for('profile.orders'))
-        games = db.select('SELECT game_id, title, photo, og.price, quantity FROM orders_games og '
+        games = db.select('SELECT g.id, title, photo, og.price, quantity FROM orders_games og '
                           'JOIN games g ON og.game_id = g.id WHERE order_id = %s', (order_id,))
         if not isinstance(games, list):
             games = [games]

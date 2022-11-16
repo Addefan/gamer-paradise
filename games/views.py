@@ -91,12 +91,12 @@ class CreateGameView(MethodView):
                 photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
             else:
                 photo_filename = '/static/images/default_game.png'
-            db.insert('INSERT INTO games (title, description, price, photo, platform, developer, '
-                      'release_date, in_stock, is_deleted) VALUES '
-                      '(%s, %s, %s, %s, %s, %s, %s, %s, %s) ',
-                      (title, description, price, photo_filename, platform, developer, release_date,
-                       in_stock, is_deleted))
-            return redirect(url_for('.index'))  # TODO: поменять на URL созданного товара
+            game_id = db.insert('INSERT INTO games (title, description, price, photo, platform, '
+                                'developer, release_date, in_stock, is_deleted) VALUES '
+                                '(%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
+                                (title, description, price, photo_filename, platform, developer,
+                                 release_date, in_stock, is_deleted))['id']
+            return redirect(url_for('.game', game_id=game_id))
         return render_template('games/create_game.html', form=form)
 
 
@@ -191,3 +191,19 @@ def make_order():
     db.delete('DELETE FROM carts WHERE user_id = %s', (user_id,))
     flash(f'Заказ #{order_id} успешно создан', 'success')
     return redirect(url_for('profile.order', order_id=order_id))
+
+
+@games.route('/<int:game_id>')
+def game(game_id):
+    db = get_db()
+    user_id = current_user.user['id'] if not current_user.is_anonymous else 0
+    cur_game = db.select('SELECT *, (SELECT avg(score) FROM reviews WHERE game_id = %s) AS rating, '
+                         'EXISTS (SELECT true FROM reviews '
+                         'WHERE user_id = %s AND game_id = %s) AS is_reviewed, '
+                         'EXISTS (SELECT true FROM carts '
+                         'WHERE game_id = id AND user_id = %s) AS in_cart,'
+                         'EXISTS (SELECT true FROM favorites '
+                         'WHERE game_id = id AND user_id = %s) AS in_favorites  '
+                         'FROM games WHERE id = %s',
+                         (game_id, user_id, game_id, user_id, user_id, game_id))
+    return render_template('games/game.html', game=cur_game)

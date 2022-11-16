@@ -1,0 +1,135 @@
+{% extends 'games/base.html' %}
+
+{% macro info_item(title, value) %}
+    <div class="row d-flex align-items-center">
+        <div class="col-5">
+            <h6 class="m-0"><span class="badge bg-secondary">{{ title }}</span></h6>
+        </div>
+        <div class="col-7 text-end">
+            <h6 class="m-0">{{ value }}</h6>
+        </div>
+    </div>
+    <hr class="my-2">
+{% endmacro %}
+
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block games_header %}
+    <h2 class="card-title">{{ game.title }}
+        <span class="badge rounded-pill bg-dark h4">{{ game.price }} ₽</span>
+    </h2>
+    <svg style="display:none;">
+        <defs>
+            <symbol id="fivestars">
+            {% for i in range(5) %}
+                <path id="star{{ i }}" transform="translate({{ 24 * i }})" d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd"></path>
+            {% endfor %}
+            </symbol>
+        </defs>
+    </svg>
+    <div class="d-flex">
+    <div class="rating mb-2 me-2">
+        <progress class="rating-bg" value="{{ game.rating }}" max="5"></progress>
+        <svg><use xlink:href="#fivestars"/></svg>
+    </div>
+    <span class="bold">{{ game.rating|default('0.00', True) }}</span></div>
+    <hr>
+{% endblock %}
+
+{% block games_content %}
+    <div class="col-9">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-5">
+                    <img src="/{{ game.photo }}" class="rounded mw-100" alt="{{ game.title }}">
+                </div>
+                <div class="col-7">
+                    <h4>Описание</h4>
+                    <hr>
+                    <p>{{ game.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block games_side %}
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+            {% if game.in_cart %}
+                <button type="button" class="btn btn-dark go-cart w-100"
+                        onclick="window.location='{{ url_for('.cart') }}'">
+                    Посмотреть в корзине
+                </button>
+            {% else %}
+                <input class="game-count me-2 text-center" type="number"
+                       min="1" value="1" max="{{ game.in_stock }}"
+                       id="game_count_{{ game.id }}">
+                <button type="button" class="btn btn-dark to-cart w-100"
+                id="to_cart_{{ game.id }}">
+                    В корзину
+                </button>
+            {% endif %}
+        </div>
+        <button type="button" class="btn btn-dark w-100 mb-3 to-fav
+        {% if game.in_favorites %}
+             checked">Удалить из избранного
+        {% else %}
+            ">В избранное
+        {% endif %}
+        </button>
+        {{ info_item('Платформа', game.platform) }}
+        {{ info_item('Разработчик', game.developer) }}
+        {{ info_item('Дата релиза', game.release_date|date('d.m.Y')) }}
+        {{ info_item('В наличии', game.in_stock|string + ' шт.' ) }}
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        $(".to-cart").on('click', function (e) {
+            let input_count = $('#game_count_' + {{ game.id }});
+            let count = input_count.val();
+            if (!input_count[0].checkValidity()) {
+                input_count.css('border-color', 'red');
+                return;
+            }
+            let data = {'checked': false, 'game_id': {{ game.id }}, 'count': count};
+
+            input_count.css('display', 'none');
+            $(this).text('Посмотреть в корзине');
+            $(this).attr('onclick', "window.location='{{ url_for('.cart') }}'");
+
+            $.ajax({
+                url: "{{ url_for('.change_cart') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            });
+        });
+
+        $('.to-fav').on('click', function () {
+            let checked = $(this).hasClass('checked');
+            console.log(checked)
+            let data = {'checked': checked, 'game_id': {{ game.id }}};
+
+            if (checked === true) {
+                $(this).removeClass('checked');
+            }
+            else {
+                $(this).addClass('checked');
+            }
+
+            let texts = ['В избранное', 'Удалить из избранного'];
+            $(this).text(texts[checked === true ? 0 : 1]);
+
+            $.ajax({
+                url: "{{ url_for('.change_favorite') }}",
+                method: 'get',
+                dataType: 'html',
+                data: data,
+            });
+        });
+    </script>
+{% endblock %}

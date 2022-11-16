@@ -13,7 +13,8 @@
         <h4 class="card-subtitle">Товары</h4>
         <hr>
         {% for game in games %}
-            <div class="card mb-2 pointer" onclick="window.location=''"> {# TODO: изменить ссылку на игру #}
+            <div class="card mb-2 pointer"
+                 onclick="window.location='{{ url_for('games.game', game_id=game.id) }}'">
                 <div class="row g-0">
                     <div class="col-3 align-self-center">
                         <img src="/{{ game.photo }}" class="rounded order-game"

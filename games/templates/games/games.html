@@ -12,7 +12,8 @@
         {% for game in games %}
             <div class="col px-2 pb-5">
                 <div class="card pointer border-0 text-center">
-                    <div class="game-image-div">
+                    <div class="game-image-div"
+                         url="{{ url_for('.game', game_id=game.id) }}">
                         <div class="fav d-flex justify-content-center align-items-center">
                             <button type="button" id=game{{ game.id }} class="fav-button">
                                 {% if game.is_favorite %}
@@ -22,8 +23,7 @@
                                 {% endif %}
                             </button>
                         </div>
-                        <img src="{{ game.photo }}" class="rounded game"
-                             alt="{{ game.title }}">
+                        <img src="{{ game.photo }}" class="rounded game" alt="{{ game.title }}">
                     </div>
                     <div class="card-body pb-0 pt-2">
                         <p class="card-text mb-1">{{ game.title }}</p>
@@ -62,6 +62,12 @@
                 dataType: 'html',
                 data: data,
             })
+        });
+
+        $('.game-image-div').click(function (e) {
+            if ($(e.target).is('div')) {
+                location.href=$(this).attr('url');
+            }
         });
     </script>
 {% endblock %}
