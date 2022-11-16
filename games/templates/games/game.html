@@ -148,7 +148,7 @@
 
             stars.on('click', function () {
                 let star_id = this.id.substring(4);
-                let data = {'game_id': {{ game.id }}, 'score': star_id};
+                let data = {'game_id': {{ game.id }}, 'score': +star_id + 1};
                 $.ajax({
                     url: "{{ url_for('.make_review') }}",
                     method: 'get',
