@@ -24,3 +24,86 @@
     </div>
 </div>
 {% endmacro %}
+
+{% macro icon(name, classes='') %}
+    <iconify-icon class="{{ classes }}" icon="{{ name }}"></iconify-icon>
+{% endmacro %}
+
+{% macro nav_link(title, icon_name, additional_classes='', href='#') %}
+    <a href="{{ href }}" class="nav-link px-0 text-white me-3 {{ additional_classes }}">
+        {{ icon(icon_name, 'me-1') }}
+        {{ title }}
+    </a>
+{% endmacro %}
+
+{% macro info_item(title, value) %}
+    <div class="row d-flex align-items-center">
+        <div class="col-5">
+            <h6 class="m-0"><span class="badge bg-secondary">{{ title }}</span></h6>
+        </div>
+        <div class="col-7 text-end">
+            <h6 class="m-0">{{ value }}</h6>
+        </div>
+    </div>
+    <hr class="my-2">
+{% endmacro %}
+
+{% macro sort_elem(order, title) %}
+    <li><a class="dropdown-item" id="{{ order }}"
+           href="{{ url_for(request.url_rule.endpoint, order=order,
+           search=request.args.get('search'),
+           platform=request.args.getlist('platform'),
+           developer=request.args.getlist('developer')) }}">
+        {{ title }}
+    </a></li>
+{% endmacro %}
+
+{% macro filter_platform_elem(title) %}
+    <div class="form-check">
+        <label>
+            <input class="form-check-input" type="checkbox" id="{{ title | replace(' ', '+') }}"
+                   value="{{ title }}"
+                   {% if title in request.args.getlist('platform') %}
+                       onclick="window.location='{{ url_for(request.url_rule.endpoint,
+                       search=request.args.get('search'),
+                       order=request.args.get('order'),
+                       developer=request.args.getlist('developer'),
+                       platform=request.args.getlist('platform')|difference([title])) }}'"
+                       checked
+                   {% else %}
+                       onclick="window.location='{{ url_for(request.url_rule.endpoint,
+                       search=request.args.get('search'),
+                       order=request.args.get('order'),
+                       developer=request.args.getlist('developer'),
+                       platform=request.args.getlist('platform') + [title]) }}'"
+                   {% endif %}
+                   >
+            {{ title }}
+        </label>
+    </div>
+{% endmacro %}
+
+{% macro filter_developer_elem(title) %}
+    <div class="form-check">
+        <label>
+            <input class="form-check-input" type="checkbox" id="{{ title | replace(' ', '+') }}"
+                   value="{{ title }}"
+                   {% if title in request.args.getlist('developer') %}
+                       onclick="window.location='{{ url_for(request.url_rule.endpoint,
+                       search=request.args.get('search'),
+                       order=request.args.get('order'),
+                       platform=request.args.getlist('platform'),
+                       developer=request.args.getlist('developer')|difference([title])) }}'"
+                       checked
+                   {% else %}
+                       onclick="window.location='{{ url_for(request.url_rule.endpoint,
+                       search=request.args.get('search'),
+                       order=request.args.get('order'),
+                       platform=request.args.getlist('platform'),
+                       developer=request.args.getlist('developer') + [title]) }}'"
+                   {% endif %}
+                   >
+            {{ title }}
+        </label>
+    </div>
+{% endmacro %}

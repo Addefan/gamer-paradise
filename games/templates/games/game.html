@@ -1,19 +1,6 @@
 {% extends 'games/base.html' %}
 
-{% from 'navbar.html' import icon with context %}
-{% from 'macros.html' import modal %}
-
-{% macro info_item(title, value) %}
-    <div class="row d-flex align-items-center">
-        <div class="col-5">
-            <h6 class="m-0"><span class="badge bg-secondary">{{ title }}</span></h6>
-        </div>
-        <div class="col-7 text-end">
-            <h6 class="m-0">{{ value }}</h6>
-        </div>
-    </div>
-    <hr class="my-2">
-{% endmacro %}
+{% from 'macros.html' import modal, icon, info_item %}
 
 {% block title %}{{ game.title }}{% endblock %}
 

@@ -1,13 +1,4 @@
-{% macro icon(name, classes='') %}
-    <iconify-icon class="{{ classes }}" icon="{{ name }}"></iconify-icon>
-{% endmacro %}
-
-{% macro nav_link(title, icon_name, additional_classes='', href='#') %}
-    <a href="{{ href }}" class="nav-link px-0 text-white me-3 {{ additional_classes }}">
-        {{ icon(icon_name, 'me-1') }}
-        {{ title }}
-    </a>
-{% endmacro %}
+{% from 'macros.html' import icon, nav_link %}
 
 <nav class="navbar navbar-dark bg-dark navbar-expand-xl p-2 sticky-top">
     <div class="container-fluid">

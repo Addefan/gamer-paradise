@@ -7,7 +7,7 @@
         <h4 class="card-title">Заказы</h4>
         <hr>
         {% for order, games_titles in orders_games_titles %}
-            <div class="card pointer"
+            <div class="card pointer mb-3"
                  onclick="window.location='{{ url_for('.order', order_id=order.id) }}'">
                 <div class="row g-0">
                     <div class="col-9">
@@ -16,7 +16,7 @@
                                 <small class="text-muted">{{ order.date|date('d B Y') }}</small>
                             </p>
                             <h5 class="card-title">Заказ #{{ order.id }}</h5>
-                            <p class="card-text">{{ games_titles|join(', ')|truncate(40) }}</p>
+                            <p class="card-text">{{ games_titles|join(', ')|truncate(35) }}</p>
                         </div>
                     </div>
                     <div class="col-3 d-flex align-items-center justify-content-center vl p-3">
