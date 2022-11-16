@@ -1,9 +1,9 @@
+import uuid
 from os import path
 
 from flask import render_template, request, current_app, redirect, url_for, flash
 from flask.views import MethodView
 from flask_login import current_user, login_required
-from werkzeug.utils import secure_filename
 
 from auth.enums import Role
 from database import get_db
@@ -23,7 +23,7 @@ def get_platforms_and_developers(db):
     return {'platforms': platforms_list, 'developers': developers_list}
 
 
-def get_searched_sorted_filtered_games(db, user_id, initial_query, initial_vals=None):
+def get_searched_sorted_filtered_games(db, initial_query, initial_vals=None):
     platforms = request.args.getlist('platform')
     developers = request.args.getlist('developer')
     order = request.args.get('order')
@@ -52,6 +52,25 @@ def get_searched_sorted_filtered_games(db, user_id, initial_query, initial_vals=
     return games_list
 
 
+def get_data_from_game_form(form):
+    title = form.title.data
+    description = form.description.data
+    price = form.price.data
+    photo = form.photo.data
+    platform = form.platform.data
+    developer = form.developer.data
+    release_date = form.release_date.data
+    in_stock = form.in_stock.data
+    is_deleted = form.is_deleted.data
+    if photo:
+        photo_filename = path.join('static', 'images', uuid.uuid4().hex)
+        photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
+    else:
+        photo_filename = 'static/images/default_game.png'
+    return (title, description, price, photo_filename, platform, developer, release_date,
+            in_stock, is_deleted)
+
+
 class GamesView(MethodView):
     def get(self):
         db = get_db()
@@ -61,7 +80,7 @@ class GamesView(MethodView):
                  'FROM games WHERE is_deleted = false AND in_stock > 0')
         vals = [user_id]
         return render_template('games/games.html', **get_platforms_and_developers(db),
-                               games=get_searched_sorted_filtered_games(db, user_id, query, vals))
+                               games=get_searched_sorted_filtered_games(db, query, vals))
 
 
 class CreateGameView(MethodView):
@@ -76,21 +95,9 @@ class CreateGameView(MethodView):
     def post(self):
         form = GameForm()
         if form.validate_on_submit():
-            title = form.title.data
-            description = form.description.data
-            price = form.price.data
-            photo = form.photo.data
-            platform = form.platform.data
-            developer = form.developer.data
-            release_date = form.release_date.data
-            in_stock = form.in_stock.data
-            is_deleted = form.is_deleted.data
+            (title, description, price, photo_filename, platform, developer,
+             release_date, in_stock, is_deleted) = get_data_from_game_form(form)
             db = get_db()
-            if photo:
-                photo_filename = path.join('static', 'images', secure_filename(photo.filename))
-                photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
-            else:
-                photo_filename = 'static/images/default_game.png'
             game_id = db.insert('INSERT INTO games (title, description, price, photo, platform, '
                                 'developer, release_date, in_stock, is_deleted) VALUES '
                                 '(%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
@@ -125,7 +132,7 @@ def favorites():
              'WHERE is_deleted = false AND in_stock > 0')
     vals = [user_id, user_id]
     return render_template('games/favorites.html', **get_platforms_and_developers(db),
-                           games=get_searched_sorted_filtered_games(db, user_id, query, vals))
+                           games=get_searched_sorted_filtered_games(db, query, vals))
 
 
 @games.route('/change_cart')
@@ -256,21 +263,9 @@ class EditGameView(MethodView):
     def post(self, game_id):
         form = GameForm()
         if form.validate_on_submit():
-            title = form.title.data
-            description = form.description.data
-            price = form.price.data
-            photo = form.photo.data
-            platform = form.platform.data
-            developer = form.developer.data
-            release_date = form.release_date.data
-            in_stock = form.in_stock.data
-            is_deleted = form.is_deleted.data
+            (title, description, price, photo_filename, platform, developer,
+             release_date, in_stock, is_deleted) = get_data_from_game_form(form)
             db = get_db()
-            if photo:
-                photo_filename = path.join('static', 'images', secure_filename(photo.filename))
-                photo.save(path.join(path.dirname(current_app.instance_path), photo_filename))
-            else:
-                photo_filename = 'static/images/default_game.png'
             game_id = db.update('UPDATE games SET (title, description, price, photo, platform, '
                                 'developer, release_date, in_stock, is_deleted) = '
                                 '(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
@@ -279,4 +274,3 @@ class EditGameView(MethodView):
                                  release_date, in_stock, is_deleted, game_id), True)['id']
             return redirect(url_for('.game', game_id=game_id))
         return render_template('games/game_form.html', form=form, action='Обновление товара')
-
