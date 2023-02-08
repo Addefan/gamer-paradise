@@ -40,6 +40,10 @@
     {{ super() }}
     <script>
         $('.fav-button').on('click', function () {
+            if ('{{ current_user.is_authenticated }}' === 'False') {
+                return
+            }
+
             $(this).prop('disabled', true);
             setTimeout(function () {
                 $(this).prop('disabled', false);
