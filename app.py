@@ -2,10 +2,10 @@ from http import HTTPStatus
 
 from flask import Flask, render_template
 
-import database as db
 import filters
 from auth import auth
 from config import Config
+from database import db
 
 from extensions import bootstrap, login_manager
 from games import games
