@@ -2,10 +2,10 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from auth.enums import Role
-from database import db
+from database import db, CRUDMixin
 
 
-class User(UserMixin, db.Model):
+class User(CRUDMixin, UserMixin, db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     email = db.Column(db.String(320), nullable=False, unique=True)
     password = db.Column(db.String(127), nullable=False)

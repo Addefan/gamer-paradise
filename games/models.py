@@ -2,10 +2,10 @@ import os
 from datetime import datetime
 
 from auth.models import User
-from database import db
+from database import db, CRUDMixin
 
 
-class Game(db.Model):
+class Game(CRUDMixin, db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
@@ -18,7 +18,7 @@ class Game(db.Model):
     is_deleted = db.Column(db.Boolean(), default=False)
 
 
-class UserGameBaseModel(db.Model):
+class UserGameBaseModel(CRUDMixin, db.Model):
     __abstract__ = True
 
     user_id = db.Column(db.ForeignKey(User.id), primary_key=True, onupdate="CASCADE", ondelete="CASCADE")
@@ -37,14 +37,14 @@ class Review(UserGameBaseModel):
     score = db.Column(db.SmallInteger)
 
 
-class Order(db.Model):
+class Order(CRUDMixin, db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id), onupdate="CASCADE", ondelete="SET NULL")
     date = db.Column(db.DateTime(timezone=True), default=datetime.now())
     amount = db.Column(db.Numeric(14, 2), nullable=False)
 
 
-class OrderGame(db.Model):
+class OrderGame(CRUDMixin, db.Model):
     order_id = db.Column(db.ForeignKey(Order.id), primary_key=True, onupdate="CASCADE", ondelete="CASCADE")
     game_id = db.Column(db.ForeignKey(Game.id), primary_key=True, onupdate="CASCADE", ondelete="SET NULL")
     quantity = db.Column(db.Integer)
