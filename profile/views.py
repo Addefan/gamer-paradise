@@ -56,11 +56,11 @@ class DeleteAccountView(MethodView):
     decorators = [login_required]
 
     def get(self):
-        user_id = current_user.user['id']
-        logout_user()
-        db = get_db()
-        db.delete('DELETE FROM users WHERE id = %s', (user_id,))
-        flash('Ваш аккаунт успешно удалён', 'success')
+        user = User.query.get(current_user.id)
+        if user.delete():
+            flash('Ваш аккаунт успешно удалён', 'success')
+        else:
+            flash('Аккаунт удалить не удалось, попробуйте позже', 'error')
         return redirect(request.referrer)
 
 
