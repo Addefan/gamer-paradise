@@ -1,7 +1,8 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask.views import MethodView
-from flask_login import login_user, logout_user, current_user, login_required
+from flask_login import login_user, logout_user, login_required
 
+from auth.decorators import not_login_required
 from auth.forms import RegisterForm, LoginForm
 from auth.models import User
 from extensions import login_manager
@@ -13,11 +14,9 @@ def load_user(user_id):
 
 
 class RegisterView(MethodView):
-    def get(self):
-        if current_user.is_authenticated:
-            flash('Вы уже зарегистрированы', 'warning')
-            return redirect(url_for('profile.index'))
+    decorators = [not_login_required]
 
+    def get(self):
         form = RegisterForm()
         return render_template('auth/auth.html', action='Регистрация', form=form)
 
@@ -31,11 +30,9 @@ class RegisterView(MethodView):
 
 
 class LoginView(MethodView):
-    def get(self):
-        if current_user.is_authenticated:
-            flash('Вы уже авторизованы', 'warning')
-            return redirect(url_for('profile.index'))
+    decorators = [not_login_required]
 
+    def get(self):
         form = LoginForm()
         return render_template('auth/auth.html', action='Авторизация', form=form)
 
