@@ -1,9 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask.views import MethodView
 from flask_login import login_user, logout_user, current_user, login_required
-from psycopg2 import errors
-from psycopg2.errorcodes import UNIQUE_VIOLATION
-from werkzeug.security import generate_password_hash, check_password_hash
 
 from auth.forms import RegisterForm, LoginForm
 from auth.models import User
@@ -45,19 +42,9 @@ class LoginView(MethodView):
     def post(self):
         form = LoginForm()
         if form.validate_on_submit():
-            email = form.email.data
-            password = form.password.data
-            remember = form.remember.data
-            db = get_db()
-            user = db.select(f'SELECT * FROM users WHERE email = %s', (email,))
-            if user and check_password_hash(user['password'], password):
-                user = UserLogin().get_user(db, email=email)
-                login_user(user, remember)
-                flash('Вы успешно авторизованы', 'success')
-                return redirect(request.args.get('next') or url_for('games.index'))
-            else:
-                form.email.errors.append('Неверный адрес электронной почты или пароль')
-                form.password.errors.append('Неверный адрес электронной почты или пароль')
+            login_user(form.user, form.remember.data)
+            flash('Вы успешно авторизованы', 'success')
+            return redirect(request.args.get('next') or url_for('games.index'))
         return render_template('auth/auth.html', action='Авторизация', form=form)
 
 

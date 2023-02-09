@@ -38,3 +38,17 @@ class RegisterForm(AuthForm):
 class LoginForm(AuthForm):
     remember = BooleanField('Запомнить меня')
     button = SubmitField('Авторизоваться')
+
+    def validate(self, extra_validators=None):
+        validated = super().validate(extra_validators=extra_validators)
+        if not validated:
+            return False
+
+        user = User.query.filter_by(email=self.email.data).first()
+        if not user or user.check_password(self.password.data):
+            self.email.errors.append('Неверный адрес электронной почты или пароль')
+            self.password.errors.append('Неверный адрес электронной почты или пароль')
+            return False
+
+        self.user = user
+        return True
