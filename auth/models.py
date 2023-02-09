@@ -10,3 +10,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(127), nullable=False)
     name = db.Column(db.String(255))
     role = db.Column(db.Enum(Role), default=Role.user)
+
+    @property
+    def is_admin(self):
+        return self.user.role == Role.admin
