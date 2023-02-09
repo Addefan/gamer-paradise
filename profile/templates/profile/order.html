@@ -14,17 +14,17 @@
         <hr>
         {% for game in games %}
             <div class="card mb-2 pointer"
-                 onclick="window.location='{{ url_for('games.game', game_id=game.id) }}'">
+                 onclick="window.location='{{ url_for('games.game', game_id=game[0].id) }}'">
                 <div class="row g-0">
                     <div class="col-3 align-self-center">
-                        <img src="/{{ game.photo }}" class="rounded order-game"
-                        alt="{{ game.title }}">
+                        <img src="/{{ game[0].photo }}" class="rounded order-game"
+                        alt="{{ game[1].title }}">
                     </div>
                     <div class="col-9">
                         <div class="card-body">
-                            <p class="card-text">{{ game.title }}</p>
-                            <p class="card-text bold">{{ game.price }} ₽
-                                <span class="card-text text-muted">x{{ game.quantity }}</span>
+                            <p class="card-text">{{ game[0].title }}</p>
+                            <p class="card-text bold">{{ game[1].price }} ₽
+                                <span class="card-text text-muted">x{{ game[1].quantity }}</span>
                             </p>
                         </div>
                     </div>
@@ -37,8 +37,8 @@
             <hr>
             {% for game in games %}
                 <div>
-                    <span class="card-text">{{ game.title }}</span>
-                    <p class="card-text float-end">{{ game.price * game.quantity }} ₽</p>
+                    <span class="card-text">{{ game[0].title }}</span>
+                    <p class="card-text float-end">{{ game[1].price * game[1].quantity }} ₽</p>
                 </div>
             {% endfor %}
             <span class="card-text h5">Итого</span>
