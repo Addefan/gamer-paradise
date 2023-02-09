@@ -27,17 +27,9 @@ class RegisterView(MethodView):
     def post(self):
         form = RegisterForm()
         if form.validate_on_submit():
-            email = form.email.data
-            password = form.password.data
-            db = get_db()
-            try:
-                db.insert('INSERT INTO users (email, password) VALUES (%s, %s);',
-                          (email, generate_password_hash(password)))
-            except errors.lookup(UNIQUE_VIOLATION):
-                form.email.errors.append('Пользователь с такой почтой уже существует')
-            else:
-                flash('Вы успешно зарегистрированы', 'success')
-                return redirect(url_for('.login'))
+            User.create(email=form.email.data, password=form.password.data)
+            flash('Вы успешно зарегистрированы', 'success')
+            return redirect(url_for('.login'))
         return render_template('auth/auth.html', action='Регистрация', form=form)
 
 
