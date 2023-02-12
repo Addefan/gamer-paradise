@@ -38,16 +38,10 @@ class OrdersView(MethodView):
     decorators = [login_required]
 
     def get(self):
-        db = get_db()
-        user_id = current_user.user['id']
-        orders = db.select('SELECT * FROM orders WHERE user_id = %s', (user_id,))
-        if not isinstance(orders, list):
-            orders = [orders]
+        orders = Order.query.filter_by(user_id=current_user.id)
         orders_games_titles = []
         for order in orders:
-            games_titles = db.select('SELECT ARRAY(SELECT title FROM games g '
-                                     'JOIN orders_games og on g.id = og.game_id '
-                                     'WHERE order_id = %s)', (order['id'],))['array']
+            games_titles = (order_game.game.title for order_game in order.games)
             orders_games_titles.append((order, games_titles))
         return render_template('profile/orders.html', page='orders',
                                orders_games_titles=orders_games_titles)
