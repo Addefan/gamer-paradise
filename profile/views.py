@@ -3,7 +3,7 @@ from flask.views import MethodView
 from flask_login import login_required, current_user
 
 from auth.models import User
-from games.models import Order, OrderGame, Game
+from games.models import Order
 from profile import profile
 from profile.forms import ChangeDataForm
 
@@ -72,5 +72,5 @@ class OrderView(MethodView):
         order = Order.query.get(order_id)
         if not order.user_id == current_user.id:
             return redirect(url_for('profile.orders'))
-        games = Game.query(OrderGame).filter_by(order_id=order.id)
-        return render_template('profile/order.html', page='orders', order=order, games=games)
+        order_games = order.games
+        return render_template('profile/order.html', page='orders', order=order, order_games=order_games)

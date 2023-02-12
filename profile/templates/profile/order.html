@@ -12,19 +12,19 @@
         <li class="list-group-item py-3">
         <h4 class="card-subtitle">Товары</h4>
         <hr>
-        {% for game in games %}
+        {% for order_game in order_games %}
             <div class="card mb-2 pointer"
-                 onclick="window.location='{{ url_for('games.game', game_id=game[0].id) }}'">
+                 onclick="window.location='{{ url_for('games.game', game_id=order_game.game_id) }}'">
                 <div class="row g-0">
                     <div class="col-3 align-self-center">
-                        <img src="/{{ game[0].photo }}" class="rounded order-game"
-                        alt="{{ game[1].title }}">
+                        <img src="/{{ order_game.game.photo }}" class="rounded order-game"
+                        alt="{{ order_game.game.title }}">
                     </div>
                     <div class="col-9">
                         <div class="card-body">
-                            <p class="card-text">{{ game[0].title }}</p>
-                            <p class="card-text bold">{{ game[1].price }} ₽
-                                <span class="card-text text-muted">x{{ game[1].quantity }}</span>
+                            <p class="card-text">{{ order_game.game.title }}</p>
+                            <p class="card-text bold">{{ order_game.price }} ₽
+                                <span class="card-text text-muted">x{{ order_game.quantity }}</span>
                             </p>
                         </div>
                     </div>
@@ -35,10 +35,10 @@
         <li class="list-group-item py-3">
             <h4 class="card-subtitle">Сумма заказа</h4>
             <hr>
-            {% for game in games %}
+            {% for order_game in order_games %}
                 <div>
-                    <span class="card-text">{{ game[0].title }}</span>
-                    <p class="card-text float-end">{{ game[1].price * game[1].quantity }} ₽</p>
+                    <span class="card-text">{{ order_game.game.title }}</span>
+                    <p class="card-text float-end">{{ order_game.price * order_game.quantity }} ₽</p>
                 </div>
             {% endfor %}
             <span class="card-text h5">Итого</span>
