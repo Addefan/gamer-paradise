@@ -12,7 +12,7 @@ from games.models import Game, Favorite
 
 
 def get_platforms_and_developers():
-    games_query = Game.query.filter_by(id_deleted=False).filter(Game.in_stock > 0)
+    games_query = Game.query.filter_by(is_deleted=False).filter(Game.in_stock > 0)
     platforms = games_query.with_entities(Game.platform).distinct()
     developers = games_query.with_entities(Game.developer).distinct()
     return {'platforms': platforms, 'developers': developers}
@@ -21,7 +21,10 @@ def get_platforms_and_developers():
 def get_searched_sorted_filtered_games(query):
     platforms = request.args.getlist('platform')
     developers = request.args.getlist('developer')
-    query = query.filter(Game.platform.in_(platforms)).filter(Game.developer.in_(developers))
+    if platforms:
+        query = query.filter(Game.platform.in_(platforms))
+    if developers:
+        query = query.filter(Game.developer.in_(developers))
 
     order = request.args.get('order')
     if order:
@@ -58,9 +61,10 @@ def get_data_from_game_form(form):
 
 class GamesView(MethodView):
     def get(self):
-        query = Game.query.filter_by(id_deleted=False).filter(Game.in_stock > 0)
-        has_like = Favorite.query.filter_by(game_id=Game.id).filter_by(user_id=current_user.id).exists().scalar()
-        query = query.add_columns(has_like)
+        query = Game.query.filter_by(is_deleted=False).filter(Game.in_stock > 0)
+        user_id = getattr(current_user, "id", -1)
+        is_favorite = Favorite.query.filter_by(game_id=Game.id, user_id=user_id).exists().label("is_favorite")
+        query = query.add_columns(is_favorite)
         return render_template('games/games.html', **get_platforms_and_developers(),
                                games=get_searched_sorted_filtered_games(query))
 
