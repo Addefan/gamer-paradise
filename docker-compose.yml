@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15.2-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: gamer_paradise_db
+      POSTGRES_USER: gamer_paradise_user
+      POSTGRES_PASSWORD: gamer_paradise
+    volumes:
+      - "db:/var/lib/postgresql/data"
+volumes:
+  db:
