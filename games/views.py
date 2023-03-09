@@ -92,14 +92,13 @@ class CreateGameView(MethodView):
 @games.route('/change_favorite')
 @login_required
 def change_favorite():
-    db = get_db()
-    user_id = current_user.user['id']
+    user_id = current_user.id
     game_id = request.args.get('game_id')
     if request.args.get('checked') == 'true':
-        db.delete('DELETE FROM favorites WHERE user_id = %s AND game_id = %s', (user_id, game_id))
+        Favorite.query.get((user_id, game_id)).delete()
     else:
-        db.insert('INSERT INTO favorites (user_id, game_id) VALUES (%s, %s)', (user_id, game_id))
-    return {}
+        Favorite.create(user_id=user_id, game_id=game_id)
+    return {"success": True}
 
 
 @games.route('/favorites')
