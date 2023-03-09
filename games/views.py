@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 from auth.enums import Role
 from games import games
 from games.forms import GameForm
-from games.models import Game, Favorite
+from games.models import Game, Favorite, Cart
 
 
 def get_platforms_and_developers():
@@ -104,16 +104,13 @@ def change_favorite():
 @games.route('/favorites')
 @login_required
 def favorites():
-    db = get_db()
-    user_id = current_user.user['id']
-    query = ('SELECT *, EXISTS (SELECT true FROM carts '
-             'WHERE game_id = id AND user_id = %s) AS in_cart '
-             'FROM (SELECT game_id FROM favorites f WHERE user_id = %s) f '
-             'JOIN games g ON g.id = f.game_id '
-             'WHERE is_deleted = false AND in_stock > 0')
-    vals = [user_id, user_id]
+    user_id = current_user.id
+    favorite_games = Favorite.query.filter_by(user_id=user_id).with_entities(Favorite.game_id)
+    query = Game.query.filter(Game.in_stock > 0, Game.id.in_(favorite_games)).filter_by(is_deleted=False)
+    in_cart = Cart.query.filter_by(game_id=Game.id, user_id=user_id).exists().label("in_cart")
+    query = query.add_columns(in_cart)
     return render_template('games/favorites.html', **get_platforms_and_developers(),
-                           games=get_searched_sorted_filtered_games(db, query, vals))
+                           games=get_searched_sorted_filtered_games(query))
 
 
 @games.route('/change_cart')

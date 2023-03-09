@@ -13,7 +13,7 @@
 {% block games_content %}
     <div class="col-9">
         <div class="card-body ps-2 pt-0">
-            {% for game in games %}
+            {% for game, in_cart in games %}
                 <div class="card mb-3 pointer" id=game{{ game.id }}
                      onclick="window.location='{{ url_for('.game', game_id=game.id) }}'">
                     <div class="row g-0">
@@ -33,7 +33,7 @@
                                 </p>
                                 <div class="position-absolute bottom-0 end-0 me-3 mb-3
                                 d-flex align-items-center">
-                                    {% if game.in_cart %}
+                                    {% if in_cart %}
                                         <button type="button" class="btn btn-dark go-cart"
                                                 onclick="window.location='{{ url_for('.cart') }}'">
                                             Посмотреть в корзине
