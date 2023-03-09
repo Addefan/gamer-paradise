@@ -1,7 +1,7 @@
 import locale
 
 
-def date(dt, fmt, loc='Russian'):
+def date(dt, fmt, loc=''):
     locale.setlocale(category=locale.LC_ALL, locale=loc)
     cods = 'aAwdbBmyYHIpMSfzZjUWcxX%GuV'
     convert = {sym: f'%#{sym}' for sym in cods}
