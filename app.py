@@ -4,9 +4,9 @@ from flask import Flask, render_template
 
 import filters
 from auth import auth
+from commands import create_db, drop_db
 from config import Config
 from database import db
-
 from extensions import bootstrap, login_manager
 from games import games
 from profile import profile
@@ -20,6 +20,7 @@ def create_app(config=Config):
     register_blueprints(app)
     register_filters(app)
     register_errorhandlers(app)
+    register_commands(app)
 
     @app.route('/')
     def index():
@@ -56,6 +57,11 @@ def register_errorhandlers(app):
         HTTPStatus.INTERNAL_SERVER_ERROR,
     ]:
         app.register_error_handler(e, render_error)
+
+
+def register_commands(app):
+    for command in (create_db, drop_db):
+        app.cli.add_command(command)
 
 
 if __name__ == "__main__":
