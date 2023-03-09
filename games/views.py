@@ -6,50 +6,35 @@ from flask.views import MethodView
 from flask_login import current_user, login_required
 
 from auth.enums import Role
-from database import get_db
 from games import games
 from games.forms import GameForm
+from games.models import Game, Favorite
 
 
-def get_platforms_and_developers(db):
-    platforms_list = db.select('SELECT DISTINCT platform FROM games '
-                               'WHERE is_deleted = false AND in_stock > 0')
-    if not isinstance(platforms_list, list):
-        platforms_list = [platforms_list]
-    developers_list = db.select('SELECT DISTINCT developer FROM games '
-                                'WHERE is_deleted = false AND in_stock > 0')
-    if not isinstance(developers_list, list):
-        developers_list = [developers_list]
-    return {'platforms': platforms_list, 'developers': developers_list}
+def get_platforms_and_developers():
+    games_query = Game.query.filter_by(id_deleted=False).filter(Game.in_stock > 0)
+    platforms = games_query.with_entities(Game.platform).distinct()
+    developers = games_query.with_entities(Game.developer).distinct()
+    return {'platforms': platforms, 'developers': developers}
 
 
-def get_searched_sorted_filtered_games(db, initial_query, initial_vals=None):
+def get_searched_sorted_filtered_games(query):
     platforms = request.args.getlist('platform')
     developers = request.args.getlist('developer')
+    query = query.filter(Game.platform.in_(platforms)).filter(Game.developer.in_(developers))
+
     order = request.args.get('order')
-    search = request.args.get('search', '').lower()
-    query = initial_query
-    if initial_vals is None:
-        initial_vals = []
-    if platforms:
-        query += ' AND platform = ANY(%s)'
-        initial_vals.append(platforms)
-    if developers:
-        query += ' AND developer = ANY(%s)'
-        initial_vals.append(developers)
-    if search:
-        query += (" AND (lower(title) LIKE '%%' || %s || '%%' OR "
-                  "lower(description) LIKE '%%' || %s || '%%')")
-        initial_vals.append(search)
-        initial_vals.append(search)
     if order:
         sort_map = {'alphabet': 'title', 'cheap': 'price', 'expensive': 'price DESC',
                     'new': 'release_date DESC', 'old': 'release_date'}
-        query += f' ORDER BY {sort_map.get(order, "id")}'
-    games_list = db.select(query, initial_vals)
-    if not isinstance(games_list, list):
-        games_list = [games_list]
-    return games_list
+        order = sort_map.get('order', 'id')
+        query = query.order_by(order)
+
+    search = request.args.get('search', '').lower()
+    if search:
+        query.filter(search in Game.title.lower() or search in Game.description.lower())
+
+    return query.all()
 
 
 def get_data_from_game_form(form):
@@ -73,14 +58,11 @@ def get_data_from_game_form(form):
 
 class GamesView(MethodView):
     def get(self):
-        db = get_db()
-        user_id = current_user.user['id'] if not current_user.is_anonymous else 0
-        query = ('SELECT *, EXISTS (SELECT true FROM favorites '
-                 'WHERE game_id = id AND user_id = %s) AS is_favorite '
-                 'FROM games WHERE is_deleted = false AND in_stock > 0')
-        vals = [user_id]
-        return render_template('games/games.html', **get_platforms_and_developers(db),
-                               games=get_searched_sorted_filtered_games(db, query, vals))
+        query = Game.query.filter_by(id_deleted=False).filter(Game.in_stock > 0)
+        has_like = Favorite.query.filter_by(game_id=Game.id).filter_by(user_id=current_user.id).exists().scalar()
+        query = query.add_columns(has_like)
+        return render_template('games/games.html', **get_platforms_and_developers(),
+                               games=get_searched_sorted_filtered_games(query))
 
 
 class CreateGameView(MethodView):
@@ -131,7 +113,7 @@ def favorites():
              'JOIN games g ON g.id = f.game_id '
              'WHERE is_deleted = false AND in_stock > 0')
     vals = [user_id, user_id]
-    return render_template('games/favorites.html', **get_platforms_and_developers(db),
+    return render_template('games/favorites.html', **get_platforms_and_developers(),
                            games=get_searched_sorted_filtered_games(db, query, vals))
 
 
