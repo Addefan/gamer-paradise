@@ -73,7 +73,7 @@ class CreateGameView(MethodView):
     decorators = [login_required]
 
     def get(self):
-        if current_user.user['role'] != Role.admin:
+        if current_user.role != Role.admin:
             return redirect(url_for('.index'))
         form = GameForm()
         return render_template('games/game_form.html', form=form, action='Добавление товара')
@@ -83,13 +83,9 @@ class CreateGameView(MethodView):
         if form.validate_on_submit():
             (title, description, price, photo_filename, platform, developer,
              release_date, in_stock, is_deleted) = get_data_from_game_form(form)
-            db = get_db()
-            game_id = db.insert('INSERT INTO games (title, description, price, photo, platform, '
-                                'developer, release_date, in_stock, is_deleted) VALUES '
-                                '(%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
-                                (title, description, price, photo_filename, platform, developer,
-                                 release_date, in_stock, is_deleted), True)['id']
-            return redirect(url_for('.game', game_id=game_id))
+            game = Game(title=title, description=description, price=price, photo=photo_filename, platform=platform,
+                        developer=developer, release_date=release_date, in_stock=in_stock, is_deleted=is_deleted).save()
+            return redirect(url_for('.game', game_id=game.id))
         return render_template('games/game_form.html', form=form, action='Добавление товара')
 
 
