@@ -116,15 +116,13 @@ def favorites():
 @games.route('/change_cart')
 @login_required
 def change_cart():
-    db = get_db()
-    user_id = current_user.user['id']
+    user_id = current_user.id
     game_id = request.args.get('game_id')
     if request.args.get('checked') == 'true':
-        db.delete('DELETE FROM carts WHERE user_id = %s AND game_id = %s', (user_id, game_id))
+        Cart.query.get((user_id, game_id)).delete()
     else:
         count = request.args.get('count')
-        db.insert('INSERT INTO carts (user_id, game_id, quantity) VALUES (%s, %s, %s)',
-                  (user_id, game_id, count))
+        Cart.create(user_id=user_id, game_id=game_id, quantity=count)
     return {}
 
 
